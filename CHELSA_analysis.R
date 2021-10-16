@@ -18,6 +18,8 @@ CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths.txt")
 data_rep <- "T:/CHELSA_DATA/" 
 
 library(stringr)
+library(raster)
+library(rgeoboundaries)
 
 for (i in 1:length(CHELSA_dwld_paths)){
   download.file(CHELSA_dwld_paths[i],
@@ -26,5 +28,18 @@ for (i in 1:length(CHELSA_dwld_paths)){
                                       unlist(gregexpr("tas_", CHELSA_dwld_paths[i])), 
                                       unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), ".tif"),
                 mode="wb")
+  raster <- raster()
 }
 
+for (i in 1:length(CHELSA_dwld_paths)){
+  download.file(CHELSA_dwld_paths[i],
+                dest = paste0(data_rep,
+                              "raster.tif"),
+                mode="wb")
+  raster <- raster(paste0(data_rep,
+                          "raster.tif"))
+  plot(raster)
+}
+
+spain_boundary <- geoboundaries("Spain")
+plot(spain_boundary)
