@@ -35,5 +35,5 @@ for (i in 1){
               paste0(data_rep,
                      str_sub(CHELSA_dwld_paths[i],
                              unlist(gregexpr("tas_", CHELSA_dwld_paths[i])),
-                             unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), "_5.tif"))
+                             unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), ".tif"))
 }
