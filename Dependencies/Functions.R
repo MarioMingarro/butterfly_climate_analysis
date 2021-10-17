@@ -9,7 +9,7 @@
 ## ---------------------------------------------------------------------------------------------------------
 ## Dependencies
 
-packages.to.use <- c("tictoc", "raster", "devtools", "VoCC","rgeos","rasterVis","gridExtra","doParallel","foreach","scales","data.table","mapplots","ggplot2","repmis", "sf", "rnaturalearth", "rnaturalearthdata", "viridis")
+packages.to.use <- c("tictoc", "raster", "tidyverse", "stringr")
 
 packages.to.use <- unique(packages.to.use)
 
