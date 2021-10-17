@@ -26,11 +26,14 @@ for (i in 1){
                 dest = "raster.tif",
                 mode="wb")
   raster <- raster("raster.tif")
-  raster_crop <- mask(raster, mask)
-  raster_crop <- crop(raster_crop, mask)
-  raster_crop <- calc(raster_crop, )
-  writeRaster(raster_crop, paste0(data_rep,
-                                  str_sub(CHELSA_dwld_paths[i],
-                                          unlist(gregexpr("tas_", CHELSA_dwld_paths[i])),
-                                          unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), ".tif"))
+  raster <- raster %>%
+    crop(mask) %>%
+    mask(mask)
+  raster <- raster/100
+  
+  writeRaster(raster,
+              paste0(data_rep,
+                     str_sub(CHELSA_dwld_paths[i],
+                             unlist(gregexpr("tas_", CHELSA_dwld_paths[i])),
+                             unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), "_5.tif"))
 }
