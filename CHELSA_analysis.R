@@ -41,5 +41,23 @@ for (i in 1:length(CHELSA_dwld_paths)){
   plot(raster)
 }
 
-spain_boundary <- geoboundaries("Spain")
-plot(spain_boundary)
+spain_boundary <- geoboundaries("Spain", adm_lvl = 1)
+portugal_boundary <- geoboundaries("Portugal", adm_lvl = 1)
+
+kk <- st_cast(spain_boundary, "POLYGON")
+library(sf)
+plot(portugal_boundary$geometry)
+plot(kk$geometry)
+plot(pp, add=TRUE)
+
+
+spain_boundary$shapeName
+library(raster) 
+kk <- subset(spain_boundary, spain_boundary$shapeName != c("Canarias", 
+                                                           "Ciudad Autónoma de Melilla", 
+                                                           "Ciudad Autónoma de Ceuta",
+                                                           "Illes Balears" ))
+drawExtent(show=TRUE, col="red") 
+drawExtent(show=TRUE, col="red") 
+pp <- drawPoly(show=TRUE, col="blue")
+
