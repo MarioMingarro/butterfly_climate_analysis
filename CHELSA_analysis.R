@@ -47,7 +47,7 @@ file.rename(paste0("B:/CHELSA_DATA/",list.files("B:/CHELSA_DATA")),
             ))
 
 
-## Climatic Velocity
+## Working with data
 # ------------------
 
 
@@ -55,8 +55,43 @@ datos <- raster::stack(list.files("B:/CHELSA_DATA", full.names = TRUE))
 
 
 # monthly to annual averages
-r <- sumSeries(datos, p = "1979-02/2019-12", yr0 = "1979-02-01", l = nlayers(datos), 
+annual_data <- sumSeries(datos, p = "1979-02/2019-12", yr0 = "1979-02-01", l = nlayers(datos), 
                fun = function(x) colMeans(x, na.rm = TRUE), freqin = "months", freqout = "years")
+
+# Select data for specific periods
+data_1985_1989 <- raster::subset(annual_data, grep(c("1985|1986|1987|1988|1989"), names(annual_data), value = T))
+
+data_2000_2004 <- raster::subset(annual_data, grep(c("2000|2001|2002|2003|2004"), names(annual_data), value = T))
+
+data_2015_2019 <- raster::subset(annual_data, grep(c("2015|2016|2017|2018|2019"), names(annual_data), value = T))
+
+#Calculate mean a standard deviation for diferent periods
+mean_1985_1989 <- calc(data_1985_1989, mean)
+sd_1985_1989 <- calc(data_1985_1989, sd)
+
+mean_2000_2004 <- calc(data_2000_2004, mean)
+sd_2000_2004 <- calc(data_2000_2004, sd)
+
+mean_2015_2019 <- calc(data_2015_2019, mean)
+sd_2015_2019 <- calc(data_2015_2019, sd)
+
+
+
+##Delete data to reduce RAM usage
+
+rm(data_1985_1989)
+rm(data_2000_2004)
+rm(data_2015_2019)
+rm(annual_data)
+rm(datos)
+
+gc(reset=TRUE)
+
+# ------------------
+transect <- readOGR("Data/TRANSECTS_2021_v2.kml")
+plot(transect)
+
+# ------------------
 # temporal trend
 vt <- tempTrend(r, th = 10)
 # spatial gradient
