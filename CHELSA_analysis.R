@@ -87,11 +87,11 @@ rm(datos)
 
 gc(reset=TRUE)
 
-##Working with
+## Working with the transect
 # ------------------
 transect <- readOGR("Data/TRANSECTS_2021_v2.kml")
 
-#Assing zones to transect
+# Assing zones to transects
 ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE",
           "GRE","GRE","GRE","GRE","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA",
           "GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA",
@@ -99,11 +99,12 @@ ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE
           "SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM",
           "SM","JA","JA","JA","JA","JA","JA","JA","JA","JA","JA","GRE","GRE","GUA")
 
+# Get the centroids
 transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
 transect_centr@data <- mutate(transect_centr@data, ZONE)
 
-
+# Extract data for each centroid
 transect_centr$mean_1985_1989 <- raster::extract(mean_1985_1989,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 transect_centr$sd_1985_1989 <- raster::extract(sd_1985_1989,
@@ -117,21 +118,22 @@ transect_centr$mean_2015_2019 <- raster::extract(mean_2015_2019,
 transect_centr$sd_2015_2019 <- raster::extract(sd_2015_2019,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 
-#Save data in excel
+# Save data in excel
 write_xlsx(transect_centr@data, "Results/Temperature_transects_results.xlsx")
 
 ## Some fast plots
 # ------------------
 
 
-#Create a theme
+# Create a theme
 theme_plot <- theme(legend.position = "none",
                     axis.title.x = element_blank(),
                     axis.text.x = element_blank(),
                     axis.title.x = element_blank())
 
-##Mean Temperature plot
-#Create a legend
+## MEAN Temperature plot
+
+# Create a legend
 legend_mean <- get_legend(ggplot(transect_centr@data, 
                             aes(x = ZONE, 
                                 y = mean_2015_2019, 
@@ -142,25 +144,34 @@ legend_mean <- get_legend(ggplot(transect_centr@data,
 legend_mean <- as_ggplot(legend_mean)
 
 ggarrange(
-ggplot(transect_centr@data, aes(x = ZONE, y = mean_1985_1989, fill = ZONE))+
-  geom_violin(aes(col=ZONE))+
-  geom_boxplot(width=0.1)+
-  labs(y="ºC",
-       title="1985-1989")+
-  theme_plot, 
-ggplot(transect_centr@data, aes(x = ZONE, y = mean_2000_2004, fill = ZONE))+
-  geom_violin(aes(col=ZONE))+
-  geom_boxplot(width=0.1)+
-  labs(y="ºC",
-       title="2000-2004")+
-  theme_plot,
-ggplot(transect_centr@data, aes(x = ZONE, y = mean_2015_2019, fill = ZONE))+
-  geom_violin(aes(col=ZONE))+
-  geom_boxplot(width=0.1)+
-  labs(y="ºC",
-       title="2015-2019")+
-  theme_plot,
-legend_mean, ncol = 2, nrow = 2
+        ggplot(transect_centr@data, 
+               aes(x = ZONE, 
+                   y = mean_1985_1989, 
+                   fill = ZONE))+
+          geom_violin(aes(col=ZONE))+
+          geom_boxplot(width=0.1)+
+          labs(y="ºC",
+               title="1985-1989")+
+          theme_plot, 
+        ggplot(transect_centr@data, 
+               aes(x = ZONE,
+                   y = mean_2000_2004,
+                   fill = ZONE))+
+          geom_violin(aes(col=ZONE))+
+          geom_boxplot(width=0.1)+
+          labs(y="ºC",
+               title="2000-2004")+
+          theme_plot,
+        ggplot(transect_centr@data, 
+               aes(x = ZONE, 
+                   y = mean_2015_2019, 
+                   fill = ZONE))+
+          geom_violin(aes(col=ZONE))+
+          geom_boxplot(width=0.1)+
+          labs(y="ºC",
+               title="2015-2019")+
+          theme_plot,
+    legend_mean, ncol = 2, nrow = 2
 )
 
 ##SD plot
@@ -175,19 +186,28 @@ legend_sd <- get_legend(ggplot(transect_centr@data,
 legend_sd <- as_ggplot(legend_sd)
 
 ggarrange(
-  ggplot(transect_centr@data, aes(x = ZONE, y = sd_1985_1989, fill = ZONE))+
+  ggplot(transect_centr@data, 
+         aes(x = ZONE, 
+             y = sd_1985_1989, 
+             fill = ZONE))+
     geom_violin(aes(col=ZONE))+
     geom_boxplot(width=0.1)+
     labs(y="ºC",
          title="1985-1989")+
     theme_plot, 
-  ggplot(transect_centr@data, aes(x = ZONE, y = sd_2000_2004, fill = ZONE))+
+  ggplot(transect_centr@data, 
+         aes(x = ZONE, 
+             y = sd_2000_2004, 
+             fill = ZONE))+
     geom_violin(aes(col=ZONE))+
     geom_boxplot(width=0.1)+
     labs(y="ºC",
          title="2000-2004")+
     theme_plot,
-  ggplot(transect_centr@data, aes(x = ZONE, y = sd_2015_2019, fill = ZONE))+
+  ggplot(transect_centr@data, 
+         aes(x = ZONE, 
+             y = sd_2015_2019, 
+             fill = ZONE))+
     geom_violin(aes(col=ZONE))+
     geom_boxplot(width=0.1)+
     labs(y="ºC",
@@ -197,13 +217,14 @@ ggarrange(
 )
 
 
+## Climate velocity (NOT RUN, IN PROGRESS)
 
 # ------------------
-# temporal trend
+# Temporal trend
 vt <- tempTrend(r, th = 10)
-# spatial gradient
+# Spatial gradient
 vg <- spatGrad(r, th = 0.0001, projected = FALSE)
-# climate velocity
+# Climate velocity
 gv <- gVoCC(vt, vg)
 
 plot(vel)
