@@ -77,7 +77,7 @@ sd_2015_2019 <- calc(data_2015_2019, sd)
 
 
 
-##Delete data to reduce RAM usage
+##Delete some irrelevant data and reduce RAM usage
 
 rm(data_1985_1989)
 rm(data_2000_2004)
@@ -87,9 +87,11 @@ rm(datos)
 
 gc(reset=TRUE)
 
+##Working with
 # ------------------
 transect <- readOGR("Data/TRANSECTS_2021_v2.kml")
 
+#Assing zones to transect
 ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE",
           "GRE","GRE","GRE","GRE","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA",
           "GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA",
@@ -115,12 +117,12 @@ transect_centr$mean_2015_2019 <- raster::extract(mean_2015_2019,
 transect_centr$sd_2015_2019 <- raster::extract(sd_2015_2019,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 
-
+#Save data in excel
 write_xlsx(transect_centr@data, "Results/Temperature_transects_results.xlsx")
 
 ## Some fast plots
 # ------------------
-library(ggpubr)
+
 
 #Create a theme
 theme_plot <- theme(legend.position = "none",
@@ -258,165 +260,3 @@ TrajClas_c <- crop(TrajClas,
                    extent(x_min, x_max, y_min, y_max))
 
 
-
-
-
-
-nombres <- c("Pto. Navacerrada (Segovia)"   ,
-             "Valsain II"                   ,
-             "HOYOCASERO"                   ,
-             "NAVACEPEDA DE TORMES"         ,
-             "NAVALGUIJO"                   ,
-             "NAVALPERAL DE TORMES"         ,
-             "NAVARREDONDA DE GREDOS"       ,
-             "PUERTO DE LA PEÑA NEGRA"     ,
-             "PLATAFORMA DE GREDOS"         ,
-             "PUERTO DEL PICO"              ,
-             "EL HORNILLO"                  ,
-             "CANDELEDA"                    ,
-             "CERRO DEL AGUILA"             ,
-             "COLLADO DE LA CENTENERA"      ,
-             "MINGO FERNANDO"               ,
-             "SOTO DE EL ARENAL"            ,
-             "Arroyo (Pto. Morcuera)"       ,
-             "Moralzarzal"                  ,
-             "Puerto Fuenfria"              ,
-             "Valsain I"                    ,
-             "La Granja - Pto. Navacerrada" ,
-             "Embalse del Ponton"           ,
-             "La Fonda Real"                ,
-             "Las Vueltas de la Barranca"   ,
-             "La Bola del Mundo"            ,
-             "Fuente de la Campanilla"      ,
-             "Cerro Piñonero"              ,
-             "Mirador Cabeza Lijar"         ,
-             "Collado de la Mina"           ,
-             "Rascafria / Raso de la Cierva",
-             "Raso de la Cierva"            ,
-             "Las Calderuelas"              ,
-             "La Flecha"                    ,
-             "Ermita de Santa Ana"          ,
-             "Collado Najarra"              ,
-             "Collado Valdemartin"          ,
-             "Angostura 2 - Aparcamiento"   ,
-             "Pista mantenimiento Valdesqui",
-             "Pradera de Majalasna"         ,
-             "Alto del Leon"                ,
-             "Pradera de Navarrulaque"      ,
-             "Los pozuelos - Cañada Real"  ,
-             "La Angostura"                 ,
-             "Camino de las Encinillas 1"   ,
-             "Restaurante La Isla"          ,
-             "Gea de Albarracín"         ,
-             "Cuenca"                       ,
-             "Valdecuenca"                  ,
-             "Las Majadas"                  ,
-             "Uña"                         ,
-             "Moscardón"                   ,
-             "Tragacete"                    ,
-             "Griegos"                      ,
-             "Tramacastilla"                ,
-             "Villar del Cobo"              ,
-             "Monterde de Albarracín"    ,
-             "Cella"                        ,
-             "Masegosa"                     ,
-             "Vega del Codorno"             ,
-             "Nacimiento del Rio Cuervo"    ,
-             "Nacimiento del Rio Tajo"      ,
-             "El Recuenco"                  ,
-             "Pinilla de Molina"            ,
-             "Salmerón"                    ,
-             "Torremocha del Pinar"         ,
-             "JAV1"                         ,
-             "JAV2"                         ,
-             "JAV3"                         ,
-             "JAV4"                         ,
-             "JAV5"                         ,
-             "JAV6"                         ,
-             "JAV7"                         ,
-             "JAV8"                         ,
-             "JAV9"                         ,
-             "JAV10"                        ,
-             "CEBEDILLA"                    ,
-             "PRADO DE LAS POZAS"           ,
-             "Collado La Gasca"             )
-
-
-zona <- c("GUA",
-          "GUA",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GRE",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "GUA",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "SM",
-          "JA",
-          "JA",
-          "JA",
-          "JA",
-          "JA",
-          "JA",
-          "JA",
-          "JA",
-          "JA",
-          "JA",
-          "GRE",
-          "GRE",
-          "GUA")
