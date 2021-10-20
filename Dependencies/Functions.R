@@ -12,7 +12,8 @@
 packages.to.use <- c("tictoc", "raster", "devtools", "VoCC","rgeos",
                      "rasterVis","gridExtra","doParallel","foreach",
                      "scales","data.table","mapplots","repmis","sf",
-                     "rnaturalearth", "rnaturalearthdata", "viridis", "tidyverse","rgdal")
+                     "rnaturalearth", "rnaturalearthdata", "viridis", 
+                     "tidyverse","rgdal", "writexl","ggpubr")
 
 packages.to.use <- unique(packages.to.use)
 
