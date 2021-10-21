@@ -5,21 +5,25 @@ gc(reset=TRUE)
 source("Dependencies/Functions.R")
 
 
-#Download CHELSA dataset 
 # ------------------
-#Monthly dataset of precipitation, maximum-, minimum-, and mean temperatures at 30 arc sec resolution for the earths land surface areas.
-#There are separate files for each month starting January 1979.
+# Download CHELSA dataset 
+# ------------------
+
+# Monthly dataset of precipitation, maximum-, minimum-, and mean temperatures at 30 arc sec resolution for the earths land surface areas.
+# There are separate files for each month starting January 1979.
 
 # https://envicloud.wsl.ch/#/?prefix=chelsa%2Fchelsa_V2%2FGLOBAL%2Fmonthly%2F
 
+# Mean temperature
+# ------------------
 
-CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths.txt")
+CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths_tmed.txt")
 mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
 mask <- spTransform(mask, "+init=epsg:4326")
 
 
 
-data_rep <- "B:/CHELSA_DATA/" 
+data_rep <- "B:/CHELSA_DATA/TMED/" 
 
 for (i in 1:length(CHELSA_dwld_paths)){
   download.file(CHELSA_dwld_paths[i],
@@ -38,15 +42,52 @@ for (i in 1:length(CHELSA_dwld_paths)){
                              unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), ".tif"))
 }
 
-file.rename(paste0("B:/CHELSA_DATA/",list.files("B:/CHELSA_DATA")),
-            paste0("B:/CHELSA_DATA/",
-                   str_sub(list.files("B:/CHELSA_DATA"), 8,11),
+file.rename(paste0("B:/CHELSA_DATA/TMED/",list.files("B:/CHELSA_DATA/TMED")),
+            paste0("B:/CHELSA_DATA/TMED/",
+                   str_sub(list.files("B:/CHELSA_DATA/TMED"), 8,11),
                    "_",
-                   str_sub(list.files("B:/CHELSA_DATA"), 5,6),
+                   str_sub(list.files("B:/CHELSA_DATA/TMED"), 5,6),
+                   ".tif"
+            ))
+
+# Monthly precipitation
+# ------------------
+
+CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths_pcp.txt")
+mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
+mask <- spTransform(mask, "+init=epsg:4326")
+
+
+
+data_rep <- "B:/CHELSA_DATA/PCP/" 
+
+for (i in 1:length(CHELSA_dwld_paths)){
+  download.file(CHELSA_dwld_paths[i],
+                dest = "raster.tif",
+                mode="wb")
+  raster <- raster("raster.tif")
+  raster <- raster %>%
+    crop(mask) %>%
+    mask(mask)
+  raster <- raster/100
+  
+  writeRaster(raster,
+              paste0(data_rep,
+                     str_sub(CHELSA_dwld_paths[i],
+                             unlist(gregexpr("tas_", CHELSA_dwld_paths[i])),
+                             unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), ".tif"))
+}
+
+file.rename(paste0("B:/CHELSA_DATA/PCP/",list.files("B:/CHELSA_DATA/PCP")),
+            paste0("B:/CHELSA_DATA/PCP/",
+                   str_sub(list.files("B:/CHELSA_DATA/PCP"), 8,11),
+                   "_",
+                   str_sub(list.files("B:/CHELSA_DATA/PCP"), 5,6),
                    ".tif"
             ))
 
 
+# ------------------
 ## Working with data
 # ------------------
 
