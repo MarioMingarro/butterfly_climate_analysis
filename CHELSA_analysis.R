@@ -17,14 +17,17 @@ source("Dependencies/Functions.R")
 # Mean temperature
 # ------------------
 
+# Load .txt with the entire directory which download
 CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths_tmed.txt")
+
+# Load and reproject iberian peninsula mask
 mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
 mask <- spTransform(mask, "+init=epsg:4326")
 
-
-
+# Directory to save all downloaded files
 data_rep <- "B:/CHELSA_DATA/TMED/" 
 
+# Loop to download all files
 for (i in 1:length(CHELSA_dwld_paths)){
   download.file(CHELSA_dwld_paths[i],
                 dest = "raster.tif",
@@ -42,6 +45,7 @@ for (i in 1:length(CHELSA_dwld_paths)){
                              unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), ".tif"))
 }
 
+# Rename all files from "tas_01_1979" to "1979_01"
 file.rename(paste0("B:/CHELSA_DATA/TMED/",list.files("B:/CHELSA_DATA/TMED")),
             paste0("B:/CHELSA_DATA/TMED/",
                    str_sub(list.files("B:/CHELSA_DATA/TMED"), 8,11),
@@ -53,10 +57,8 @@ file.rename(paste0("B:/CHELSA_DATA/TMED/",list.files("B:/CHELSA_DATA/TMED")),
 # Monthly precipitation
 # ------------------
 
+#Same steps as mean temperature (above)
 CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths_pcp.txt")
-mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
-mask <- spTransform(mask, "+init=epsg:4326")
-
 
 data_rep <- "B:/CHELSA_DATA/PCP/" 
 
@@ -86,16 +88,17 @@ file.rename(paste0("B:/CHELSA_DATA/PCP/",list.files("B:/CHELSA_DATA/PCP")),
             ))
 
 
+
 # ------------------
 ## Working with data
 # ------------------
 
-
+# Stack all files
 datos <- raster::stack(list.files("B:/CHELSA_DATA", full.names = TRUE))
 
 
-# monthly to annual averages
-annual_data <- sumSeries(datos, p = "1979-02/2019-12", yr0 = "1979-02-01", l = nlayers(datos), 
+# Monthly to annual averages (VoCC package)
+annual_data <- VoCC::sumSeries(datos, p = "1979-02/2019-12", yr0 = "1979-02-01", l = nlayers(datos), 
                fun = function(x) colMeans(x, na.rm = TRUE), freqin = "months", freqout = "years")
 
 # Select data for specific periods
@@ -105,7 +108,7 @@ data_2000_2004 <- raster::subset(annual_data, grep(c("2000|2001|2002|2003|2004")
 
 data_2015_2019 <- raster::subset(annual_data, grep(c("2015|2016|2017|2018|2019"), names(annual_data), value = T))
 
-#Calculate mean a standard deviation for diferent periods
+# Calculate mean a standard deviation for diferent periods
 mean_1985_1989 <- calc(data_1985_1989, mean)
 sd_1985_1989 <- calc(data_1985_1989, sd)
 
@@ -117,7 +120,7 @@ sd_2015_2019 <- calc(data_2015_2019, sd)
 
 
 
-##Delete some irrelevant data and reduce RAM usage
+## Delete some irrelevant data and reduce RAM usage
 
 rm(data_1985_1989)
 rm(data_2000_2004)
@@ -127,6 +130,7 @@ rm(datos)
 
 gc(reset=TRUE)
 
+# ------------------
 ## Working with the transect
 # ------------------
 transect <- readOGR("Data/TRANSECTS_2021_v2.kml")
@@ -161,6 +165,7 @@ transect_centr$sd_2015_2019 <- raster::extract(sd_2015_2019,
 # Save data in excel
 write_xlsx(transect_centr@data, "Results/Temperature_transects_results.xlsx")
 
+# ------------------
 ## Some fast plots
 # ------------------
 
