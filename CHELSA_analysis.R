@@ -58,7 +58,6 @@ mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
 mask <- spTransform(mask, "+init=epsg:4326")
 
 
-
 data_rep <- "B:/CHELSA_DATA/PCP/" 
 
 for (i in 1:length(CHELSA_dwld_paths)){
@@ -74,15 +73,15 @@ for (i in 1:length(CHELSA_dwld_paths)){
   writeRaster(raster,
               paste0(data_rep,
                      str_sub(CHELSA_dwld_paths[i],
-                             unlist(gregexpr("tas_", CHELSA_dwld_paths[i])),
+                             unlist(gregexpr("pr_", CHELSA_dwld_paths[i])),
                              unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), ".tif"))
 }
 
 file.rename(paste0("B:/CHELSA_DATA/PCP/",list.files("B:/CHELSA_DATA/PCP")),
             paste0("B:/CHELSA_DATA/PCP/",
-                   str_sub(list.files("B:/CHELSA_DATA/PCP"), 8,11),
+                   str_sub(list.files("B:/CHELSA_DATA/PCP"), 7,10),
                    "_",
-                   str_sub(list.files("B:/CHELSA_DATA/PCP"), 5,6),
+                   str_sub(list.files("B:/CHELSA_DATA/PCP"), 4,5),
                    ".tif"
             ))
 
