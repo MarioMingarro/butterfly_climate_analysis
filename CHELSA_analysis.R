@@ -118,6 +118,7 @@ sd_2000_2004 <- calc(data_2000_2004, sd)
 mean_2015_2019 <- calc(data_2015_2019, mean)
 sd_2015_2019 <- calc(data_2015_2019, sd)
 
+# Calculate tmax mcal tmin mesfrio
 
 
 ## Delete some irrelevant data and reduce RAM usage
@@ -145,7 +146,7 @@ ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE
 
 # Get the centroids
 transect_centr <- gCentroid(transect, byid = TRUE)
-transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
+transect_centr <- SpatialPointsD ataFrame(transect_centr, data = transect@data)
 transect_centr@data <- mutate(transect_centr@data, ZONE)
 
 # Extract data for each centroid
