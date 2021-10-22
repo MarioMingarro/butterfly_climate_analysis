@@ -14,6 +14,8 @@ source("Dependencies/Functions.R")
 
 # https://envicloud.wsl.ch/#/?prefix=chelsa%2Fchelsa_V2%2FGLOBAL%2Fmonthly%2F
 
+
+
 # Mean temperature
 # ------------------
 
@@ -53,6 +55,8 @@ file.rename(paste0("B:/CHELSA_DATA/TMED/",list.files("B:/CHELSA_DATA/TMED")),
                    str_sub(list.files("B:/CHELSA_DATA/TMED"), 5,6),
                    ".tif"
             ))
+
+
 
 # Monthly precipitation
 # ------------------
