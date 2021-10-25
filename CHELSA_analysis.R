@@ -98,11 +98,11 @@ file.rename(paste0("B:/CHELSA_DATA/PCP/",list.files("B:/CHELSA_DATA/PCP")),
 # ------------------
 
 # Stack all files
-datos <- raster::stack(list.files("B:/CHELSA_DATA", full.names = TRUE))
+datos <- raster::stack(list.files("B:/CHELSA_DATA/PCP", full.names = TRUE))
 
 
 # Monthly to annual averages (VoCC package)
-annual_data <- VoCC::sumSeries(datos, p = "1979-02/2019-12", yr0 = "1979-02-01", l = nlayers(datos), 
+annual_data <- VoCC::sumSeries(datos, p = "1979-01/2018-12", yr0 = "1979-01-01", l = nlayers(datos), 
                fun = function(x) colMeans(x, na.rm = TRUE), freqin = "months", freqout = "years")
 
 # Select data for specific periods
@@ -110,17 +110,17 @@ data_1985_1989 <- raster::subset(annual_data, grep(c("1985|1986|1987|1988|1989")
 
 data_2000_2004 <- raster::subset(annual_data, grep(c("2000|2001|2002|2003|2004"), names(annual_data), value = T))
 
-data_2015_2019 <- raster::subset(annual_data, grep(c("2015|2016|2017|2018|2019"), names(annual_data), value = T))
+data_2015_2018 <- raster::subset(annual_data, grep(c("2015|2016|2017|2018"), names(annual_data), value = T))
 
 # Calculate mean a standard deviation for diferent periods
-mean_1985_1989 <- calc(data_1985_1989, mean)
+sum_1985_1989 <- calc(data_1985_1989, sum)
 sd_1985_1989 <- calc(data_1985_1989, sd)
 
-mean_2000_2004 <- calc(data_2000_2004, mean)
+sum_2000_2004 <- calc(data_2000_2004, sum)
 sd_2000_2004 <- calc(data_2000_2004, sd)
 
-mean_2015_2019 <- calc(data_2015_2019, mean)
-sd_2015_2019 <- calc(data_2015_2019, sd)
+sum_2015_2018 <- calc(data_2015_2018, sum)
+sd_2015_2018 <- calc(data_2015_2018, sd)
 
 # Calculate tmax mcal tmin mesfrio
 
@@ -129,7 +129,7 @@ sd_2015_2019 <- calc(data_2015_2019, sd)
 
 rm(data_1985_1989)
 rm(data_2000_2004)
-rm(data_2015_2019)
+rm(data_2015_2018)
 rm(annual_data)
 rm(datos)
 
@@ -150,25 +150,25 @@ ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE
 
 # Get the centroids
 transect_centr <- gCentroid(transect, byid = TRUE)
-transect_centr <- SpatialPointsD ataFrame(transect_centr, data = transect@data)
+transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
 transect_centr@data <- mutate(transect_centr@data, ZONE)
 
 # Extract data for each centroid
-transect_centr$mean_1985_1989 <- raster::extract(mean_1985_1989,
+transect_centr$sum_1985_1989 <- raster::extract(sum_1985_1989,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 transect_centr$sd_1985_1989 <- raster::extract(sd_1985_1989,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
-transect_centr$mean_2000_2004 <- raster::extract(mean_2000_2004,
+transect_centr$sum_2000_2004 <- raster::extract(sum_2000_2004,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 transect_centr$sd_2000_2004 <- raster::extract(sd_2000_2004,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
-transect_centr$mean_2015_2019 <- raster::extract(mean_2015_2019,
+transect_centr$sum_2015_2018 <- raster::extract(sum_2015_2018,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
-transect_centr$sd_2015_2019 <- raster::extract(sd_2015_2019,
+transect_centr$sd_2015_2018 <- raster::extract(sd_2015_2018,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 
 # Save data in excel
-write_xlsx(transect_centr@data, "Results/Temperature_transects_results.xlsx")
+write_xlsx(transect_centr@data, "Results/Precipitation_transects_results.xlsx")
 
 # ------------------
 ## Some fast plots
@@ -179,24 +179,24 @@ write_xlsx(transect_centr@data, "Results/Temperature_transects_results.xlsx")
 theme_plot <- theme(legend.position = "none",
                     axis.title.x = element_blank(),
                     axis.text.x = element_blank(),
-                    axis.title.x = element_blank())
+                    axis.title.y = element_blank())
 
 ## MEAN Temperature plot
 
 # Create a legend
 legend_mean <- get_legend(ggplot(transect_centr@data, 
                             aes(x = ZONE, 
-                                y = mean_2015_2019, 
+                                y = sum_2015_2018, 
                                 fill = ZONE))+
                        geom_violin()+
-                       scale_fill_discrete(name = "Mean\nTemperature"))
+                       scale_fill_discrete(name = "Annual\nprecipitation"))
 
 legend_mean <- as_ggplot(legend_mean)
 
 ggarrange(
         ggplot(transect_centr@data, 
                aes(x = ZONE, 
-                   y = mean_1985_1989, 
+                   y = sum_1985_1989, 
                    fill = ZONE))+
           geom_violin(aes(col=ZONE))+
           geom_boxplot(width=0.1)+
@@ -205,7 +205,7 @@ ggarrange(
           theme_plot, 
         ggplot(transect_centr@data, 
                aes(x = ZONE,
-                   y = mean_2000_2004,
+                   y = sum_2000_2004,
                    fill = ZONE))+
           geom_violin(aes(col=ZONE))+
           geom_boxplot(width=0.1)+
@@ -214,12 +214,12 @@ ggarrange(
           theme_plot,
         ggplot(transect_centr@data, 
                aes(x = ZONE, 
-                   y = mean_2015_2019, 
+                   y = sum_2015_2018, 
                    fill = ZONE))+
           geom_violin(aes(col=ZONE))+
           geom_boxplot(width=0.1)+
           labs(y="ºC",
-               title="2015-2019")+
+               title="2015-2018")+
           theme_plot,
     legend_mean, ncol = 2, nrow = 2
 )
@@ -228,10 +228,10 @@ ggarrange(
 
 legend_sd <- get_legend(ggplot(transect_centr@data, 
                             aes(x = ZONE, 
-                                y = mean_2015_2019, 
+                                y = sum_2015_2018, 
                                 fill = ZONE))+
                        geom_violin()+
-                       scale_fill_discrete(name = "SD\nTemperature"))
+                       scale_fill_discrete(name = "SD\nPrecipitation"))
 
 legend_sd <- as_ggplot(legend_sd)
 
@@ -256,7 +256,7 @@ ggarrange(
     theme_plot,
   ggplot(transect_centr@data, 
          aes(x = ZONE, 
-             y = sd_2015_2019, 
+             y = sd_2015_2018, 
              fill = ZONE))+
     geom_violin(aes(col=ZONE))+
     geom_boxplot(width=0.1)+
