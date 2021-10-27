@@ -168,18 +168,25 @@ for (i in 1:length(CHELSA_dwld_paths)){
 }
 
 # Rename all files from "tas_01_1979" to "1979_01"
-file.rename(paste0("B:/CHELSA_DATA/TMAX/",list.files("B:/CHELSA_DATA/TMAX")),
-            paste0("B:/CHELSA_DATA/TMAX/",
-                   str_sub(list.files("B:/CHELSA_DATA/TMAX"), 8,11),
+file.rename(paste0("B:/CHELSA_DATA/TMIN/",list.files("B:/CHELSA_DATA/TMIN")),
+            paste0("B:/CHELSA_DATA/TMIN/",
+                   str_sub(list.files("B:/CHELSA_DATA/TMIN"), 8,11),
                    "_",
-                   str_sub(list.files("B:/CHELSA_DATA/TMAX"), 5,6),
+                   str_sub(list.files("B:/CHELSA_DATA/TMIN"), 5,6),
                    ".tif"
             ))
 
 
 ##TMAX_cal
 ##TMIN_FRIO
+years <- seq(1979, 2019)
+i=1979
+for (i in 1979){
+  TMCM <- calc(stack(raster(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i)))), min)
+  
+}
 
+pp <- raster(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i)))
 # ------------------
 ## Working with data
 # ------------------
