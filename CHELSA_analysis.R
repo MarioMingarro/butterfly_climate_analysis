@@ -177,7 +177,10 @@ file.rename(paste0("B:/CHELSA_DATA/TMAX/",list.files("B:/CHELSA_DATA/TMAX")),
             ))
 
 
+##TMAX_cal
+##TMIN_FRIO
 
+# ------------------
 ## Working with data
 # ------------------
 
