@@ -179,14 +179,12 @@ file.rename(paste0("B:/CHELSA_DATA/TMIN/",list.files("B:/CHELSA_DATA/TMIN")),
 
 ##TMAX_cal
 ##TMIN_FRIO
-years <- seq(1979, 2019)
-i=1979
-for (i in 1979){
-  TMCM <- calc(stack(raster(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i)))), min)
+
+for (i in 1979:2019){
+  TMCM <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i), full.names = TRUE)), min)
   
 }
 
-pp <- raster(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i)))
 # ------------------
 ## Working with data
 # ------------------
