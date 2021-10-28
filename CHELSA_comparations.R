@@ -3,7 +3,9 @@ gc(reset=TRUE)
 source("Dependencies/Functions.R")
 
 # ------------------
+
 # CHELSA dataset comparation 
+
 # ------------------
 
 V_2_1 <- raster::stack(list.files("A:/CHELSA_COMPARATION/CHELSA_2.1", full.names = TRUE ))
@@ -35,6 +37,7 @@ V_cruts_m <- V_cruts %>%
 V_cruts_m <- V_cruts_m/10
 
 plot(V_cruts_m)
+
 # ------------------
 
 random_points <- spsample(mask, n=100, type='random')
@@ -51,7 +54,9 @@ V_cruts_results <- raster::extract(V_cruts_m,
                                  random_points,
                                  df=TRUE)
 results <- mutate(V_2_1_results,V_cruts_results)
+
 # ------------------
+
 m <- lm(results$tasmax_04_2013_V.2.1 ~ results$tmax_4_2013_V.1.0)
 m <- summary(m)
 ggplot(results, aes(tasmax_04_2013_V.2.1, tmax_4_2013_V.1.0))+
