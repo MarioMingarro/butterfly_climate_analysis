@@ -206,13 +206,13 @@ data_2000_2004 <- raster::subset(annual_data, grep(c("2000|2001|2002|2003|2004")
 data_2015_2018 <- raster::subset(annual_data, grep(c("2015|2016|2017|2018"), names(annual_data), value = T))
 
 # Calculate mean a standard deviation for diferent periods
-sum_1985_1989 <- calc(data_1985_1989, sum)
+mean_1985_1989 <- calc(data_1985_1989, mean)
 sd_1985_1989 <- calc(data_1985_1989, sd)
 
-sum_2000_2004 <- calc(data_2000_2004, sum)
+mean_2000_2004 <- calc(data_2000_2004, mean)
 sd_2000_2004 <- calc(data_2000_2004, sd)
 
-sum_2015_2019 <- calc(data_2015_2019, sum)
+mean_2015_2019 <- calc(data_2015_2019, mean)
 sd_2015_2019 <- calc(data_2015_2019, sd)
 
 # Calculate tmax mcal tmin mesfrio
@@ -250,20 +250,20 @@ ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE
 # Get the centroids
 transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
-transect_centr@data <- mutate(transect_centr@data, ZONE)
+
 transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations, by = "Name")
 view(transect_centr@data)
 
 # Extract data for each centroid
-transect_centr$sum_1985_1989 <- raster::extract(sum_1985_1989,
+transect_centr$mean_1985_1989 <- raster::extract(mean_1985_1989,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 transect_centr$sd_1985_1989 <- raster::extract(sd_1985_1989,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
-transect_centr$sum_2000_2004 <- raster::extract(sum_2000_2004,
+transect_centr$mean_2000_2004 <- raster::extract(mean_2000_2004,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 transect_centr$sd_2000_2004 <- raster::extract(sd_2000_2004,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
-transect_centr$sum_2015_2019 <- raster::extract(sum_2015_2019,
+transect_centr$mean_2015_2019 <- raster::extract(mean_2015_2019,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 transect_centr$sd_2015_2019 <- raster::extract(sd_2015_2019,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
@@ -287,7 +287,7 @@ theme_plot <- theme(legend.position = "none",
 # Create a legend
 legend_mean <- get_legend(ggplot(transect_centr@data, 
                             aes(x = ZONE, 
-                                y = sum_2015_2018, 
+                                y = sum_2015_2019, 
                                 fill = ZONE))+
                        geom_violin()+
                        scale_fill_discrete(name = "Annual\nprecipitation"))
@@ -315,7 +315,7 @@ ggarrange(
           theme_plot,
         ggplot(transect_centr@data, 
                aes(x = ZONE, 
-                   y = sum_2015_2018, 
+                   y = sum_2015_2019, 
                    fill = ZONE))+
           geom_violin(aes(col=ZONE))+
           geom_boxplot(width=0.1)+
