@@ -212,8 +212,8 @@ sd_1985_1989 <- calc(data_1985_1989, sd)
 sum_2000_2004 <- calc(data_2000_2004, sum)
 sd_2000_2004 <- calc(data_2000_2004, sd)
 
-sum_2015_2018 <- calc(data_2015_2018, sum)
-sd_2015_2018 <- calc(data_2015_2018, sd)
+sum_2015_2019 <- calc(data_2015_2019, sum)
+sd_2015_2019 <- calc(data_2015_2019, sd)
 
 # Calculate tmax mcal tmin mesfrio
 
@@ -232,6 +232,12 @@ gc(reset=TRUE)
 ## Working with the transect
 # ------------------
 transect <- readOGR("Data/TRANSECTS_2021_v2.kml")
+rm(Temperature_transects_with_elevations)
+
+library(readxl)
+Transects_with_elevations <- read_excel("Temperature_transects_with_elevations.xlsx")
+Transects_with_elevations <- Transects_with_elevations %>% 
+  select(c(Name, Name_new, Alt, CODIGO, ZONE))
 
 # Assing zones to transects
 ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE",
@@ -245,6 +251,8 @@ ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE
 transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
 transect_centr@data <- mutate(transect_centr@data, ZONE)
+transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations, by = "Name")
+view(transect_centr@data)
 
 # Extract data for each centroid
 transect_centr$sum_1985_1989 <- raster::extract(sum_1985_1989,
@@ -255,9 +263,9 @@ transect_centr$sum_2000_2004 <- raster::extract(sum_2000_2004,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 transect_centr$sd_2000_2004 <- raster::extract(sd_2000_2004,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
-transect_centr$sum_2015_2018 <- raster::extract(sum_2015_2018,
+transect_centr$sum_2015_2019 <- raster::extract(sum_2015_2019,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
-transect_centr$sd_2015_2018 <- raster::extract(sd_2015_2018,
+transect_centr$sd_2015_2019 <- raster::extract(sd_2015_2019,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 
 # Save data in excel
