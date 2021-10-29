@@ -269,7 +269,7 @@ transect_centr$sd_2015_2019 <- raster::extract(sd_2015_2019,
                                                  transect_centr, buffer = NULL ,exact = TRUE)
 
 # Save data in excel
-write_xlsx(transect_centr@data, "Results/Precipitation_transects_results.xlsx")
+write_xlsx(transect_centr@data, "Results/Temperature_transects_results.xlsx")
 
 # ------------------
 ## Some fast plots
