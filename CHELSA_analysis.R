@@ -193,10 +193,10 @@ for (i in 1979:2019){
 ### TMED ----
 TMED_annual <- raster::stack()
 for (i in 1979:2019){
-  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMED", pattern = paste0(i), full.names = TRUE)), mean)
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMED", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
   TMED_annual <- raster::stack(TMED_annual, raster)
 }
-
+names(TMED_annual) <- paste0("Y_", seq(1979, 2019, by = 1))
 
 
 ### PCP ----
@@ -206,40 +206,85 @@ for (i in 1979:2018){
   PCP_annual <- raster::stack(PCP_annual, raster)
 }
 
-# Calculate tmax mcal tmin mesfrio
+### TXMC ----
+TMAX_annual <- raster::stack()
+for (i in 1979:2019){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMAX", pattern = paste0(i), full.names = TRUE)), max) # MAX
+  TMAX_annual <- raster::stack(TMAX_annual, raster)
+}
+### TNMF ----
+TMIN_annual <- raster::stack()
+for (i in 1979:2019){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i), full.names = TRUE)), min) # MIN
+  TMIN_annual <- raster::stack(TMIN_annual, raster)
+}
 
+## TMED ----
 
-## Select data for specific periods ----
+### Select data for specific periods ----
 
-data_1985_1989 <- raster::subset(annual_data, grep(c("1985|1986|1987|1988|1989"), names(annual_data), value = T))
+Tmed_1985_1989 <- raster::subset(TMED_annual, grep(c("1985|1986|1987|1988|1989"), names(TMED_annual), value = T))
 
-data_2000_2004 <- raster::subset(annual_data, grep(c("2000|2001|2002|2003|2004"), names(annual_data), value = T))
+Tmed_2000_2004 <- raster::subset(TMED_annual, grep(c("2000|2001|2002|2003|2004"), names(TMED_annual), value = T))
 
-data_2015_2018 <- raster::subset(annual_data, grep(c("2015|2016|2017|2018"), names(annual_data), value = T))
+Tmed_2015_2019 <- raster::subset(TMED_annual, grep(c("2015|2016|2017|2018|2019"), names(TMED_annual), value = T))
 
-## Calculate mean a standard deviation for diferent periods ----
-mean_1985_1989 <- calc(data_1985_1989, mean)
-sd_1985_1989 <- calc(data_1985_1989, sd)
+### Calculate mean a standard deviation for diferent periods ----
 
-mean_2000_2004 <- calc(data_2000_2004, mean)
-sd_2000_2004 <- calc(data_2000_2004, sd)
+Tmed_mean_1985_1989 <- calc(Tmed_1985_1989, mean)
+Tmed_sd_1985_1989 <- calc(Tmed_1985_1989, sd)
 
-mean_2015_2019 <- calc(data_2015_2019, mean)
-sd_2015_2019 <- calc(data_2015_2019, sd)
+Tmed_mean_2000_2004 <- calc(Tmed_2000_2004, mean)
+Tmed_sd_2000_2004 <- calc(Tmed_2000_2004, sd)
 
+Tmed_mean_2015_2019 <- calc(Tmed_2015_2019, mean)
+Tmed_sd_2015_2019 <- calc(Tmed_2015_2019, sd)
 
+### Comparing TMED 2015-2018 vs 2015-2019 ----
 
+Tmed_2015_2018 <- raster::subset(TMED_annual, grep(c("2015|2016|2017|2018"), names(TMED_annual), value = T))
+Tmed_2015_2019 <- raster::subset(TMED_annual, grep(c("2015|2016|2017|2018|2019"), names(TMED_annual), value = T))
 
-## Delete some irrelevant data and reduce RAM usage ----
+Tmed_mean_2015_2018 <- calc(Tmed_2015_2018, mean)
+Tmed_sd_2015_2018 <- calc(Tmed_2015_2018, sd)
 
-rm(data_1985_1989)
-rm(data_2000_2004)
-rm(data_2015_2018)
-rm(annual_data)
-rm(datos)
+Tmed_mean_2015_2019 <- calc(Tmed_2015_2019, mean)
+Tmed_sd_2015_2019 <- calc(Tmed_2015_2019, sd)
 
-gc(reset=TRUE)
+library(diffeR)
 
+CrossTab_mean <- as.tibble(crosstabm(Tmed_mean_2015_2019, Tmed_mean_2015_2018, percent = TRUE))
+write_xlsx(CrossTab_mean, "Results/CrossTab_tmed_2015_2018_vs_2015_2019.xlsx")
+MADscatterplot(Tmed_mean_2015_2018,Tmed_mean_2015_2019)
+CrossTab_sd <- as.tibble(crosstabm(Tmed_sd_2015_2019, Tmed_sd_2015_2018, percent = TRUE))
+write_xlsx(CrossTab_sd, "Results/CrossTab_tmed_sd_2015_2018_vs_2015_2019.xlsx")
+MADscatterplot(Tmed_sd_2015_2018,Tmed_sd_2015_2019)
+
+mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
+mask <- spTransform(mask, "+init=epsg:4326")
+
+random_points <- spsample(mask, n = 3, type='random')
+proj4string(random_points) = CRS("+init=epsg:4326")
+results <- raster::extract(PCP_annual,
+                           random_points,
+                           df=TRUE)
+results <- t(results)
+results <-  as.data.frame(results)
+results <- results[-1,]
+results <-  as.data.frame(results)
+results <- mutate(results, year = seq(1979,2018, by = 1))
+
+ggplot(results)+
+  geom_point(aes(year, V1), col= "red")+
+  geom_smooth(aes(year, V1),method = "loess", col = "red", se= FALSE)+
+  geom_point(aes(year, V2), col= "blue")+
+  geom_smooth(aes(year, V2),method = "loess", col = "blue", se= FALSE)+
+  geom_point(aes(year, V3), col= "green")+
+  geom_smooth(aes(year, V3),method = "loess", col = "green", se= FALSE)+
+  theme(axis.title = element_blank())
+
+plot(mask)
+plot(random_points, add=T)
 
 # Working with the transect ----
 
@@ -251,20 +296,12 @@ Transects_with_elevations <- read_excel("Temperature_transects_with_elevations.x
 Transects_with_elevations <- Transects_with_elevations %>% 
   select(c(Name, Name_new, Alt, CODIGO, ZONE))
 
-## Assing zones to transects ----
-ZONE <- c("GUA","GUA","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE","GRE",
-          "GRE","GRE","GRE","GRE","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA",
-          "GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA",
-          "GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","GUA","SM","SM","SM","SM",
-          "SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM","SM",
-          "SM","JA","JA","JA","JA","JA","JA","JA","JA","JA","JA","GRE","GRE","GUA")
 
 ## Get the centroids ----
 transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
-
 transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations, by = "Name")
-view(transect_centr@data)
+
 
 ## Extract data for each centroid ----
 transect_centr$mean_1985_1989 <- raster::extract(mean_1985_1989,
