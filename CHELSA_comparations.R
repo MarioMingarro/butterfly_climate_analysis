@@ -51,8 +51,8 @@ V_2_1_results <- raster::extract(V_2_1_m,
                                  random_points,
                                  df=TRUE)
 V_cruts_results <- raster::extract(V_cruts_m,
-                                 random_points,
-                                 df=TRUE)
+                                   random_points,
+                                   df=TRUE)
 results <- mutate(V_2_1_results,V_cruts_results)
 
 # ------------------
@@ -87,3 +87,58 @@ ggplot(results)+
 
 kk <- corLocal(V_2_1_m[[1]],V_cruts_m[[2]])
 plot(kk)
+
+data_rep <- "B:/CHELSA_DATA/TMED"
+
+
+
+ggplot(results)+
+  geom_point(aes(year, V1),col= "red")
+geom_smooth(method = "loess", col = "red", se= FALSE)
+geom_point(aes(x=results$V2), col= "blue")
+
+
+
+
+
+
+
+
+
+
+
+
+data <- raster::stack(list.files("B:/CHELSA_DATA/PCP", full.names = TRUE ))
+
+PCP_annual <- raster::stack()
+for (i in 1979:2018){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/PCP", pattern = paste0(i), full.names = TRUE)), sum)
+  PCP_annual <- raster::stack(PCP_annual, raster)
+}
+plot(PCP_annual)
+
+mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
+mask <- spTransform(mask, "+init=epsg:4326")
+
+random_points <- spsample(mask, n=3, type='random')
+proj4string(random_points) = CRS("+init=epsg:4326")
+results <- raster::extract(PCP_annual,
+                           random_points,
+                           df=TRUE)
+results <- t(results)
+results <-  as.data.frame(results)
+results <- results[-1,]
+results <-  as.data.frame(results)
+results <- mutate(results, year = seq(1979,2018, by = 1))
+
+ggplot(results)+
+  geom_point(aes(year, V1), col= "red")+
+  geom_smooth(aes(year, V1),method = "loess", col = "red", se= FALSE)+
+  geom_point(aes(year, V2), col= "blue")+
+  geom_smooth(aes(year, V2),method = "loess", col = "blue", se= FALSE)+
+  geom_point(aes(year, V3), col= "green")+
+  geom_smooth(aes(year, V3),method = "loess", col = "green", se= FALSE)+
+  theme(axis.title = element_blank())
+
+plot(mask)
+plot(random_points, add=T)
