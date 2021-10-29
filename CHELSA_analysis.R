@@ -198,6 +198,13 @@ datos <- raster::stack(list.files("B:/CHELSA_DATA/PCP", full.names = TRUE))
 annual_data <- VoCC::sumSeries(datos, p = "1979-01/2018-12", yr0 = "1979-01-01", l = nlayers(datos), 
                fun = function(x) colMeans(x, na.rm = TRUE), freqin = "months", freqout = "years")
 
+# PCP
+PCP_annual <- raster::stack()
+for (i in 1979:2018){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/PCP", pattern = paste0(i), full.names = TRUE)), sum)
+  PCP_annual <- raster::stack(PCP_annual, raster)
+}
+
 # Select data for specific periods
 data_1985_1989 <- raster::subset(annual_data, grep(c("1985|1986|1987|1988|1989"), names(annual_data), value = T))
 
