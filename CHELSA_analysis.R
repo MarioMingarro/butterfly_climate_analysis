@@ -532,7 +532,7 @@ write_xlsx(transect_centr_TNMF@data, "Results/Min_temp_coldest_month_transects_r
 
 
 # Some fast plots ----
-## TMED
+## TMED ----
 
 # Create a theme
 theme_plot <- theme(legend.position = "none",
