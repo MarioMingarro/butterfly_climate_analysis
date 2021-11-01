@@ -1,5 +1,5 @@
 
-
+# Clean and load packages ----
 rm(list=(ls()[ls()!="v"]))
 gc(reset=TRUE)
 source("Dependencies/Functions.R")
@@ -210,20 +210,20 @@ names(PCP_annual) <- paste0("Y_", seq(1979, 2018, by = 1))
 plot(PCP_annual$Y_1997)
 
 ### TXMC ----
-TMAX_annual <- raster::stack()
+TXMC <- raster::stack()
 for (i in 1979:2019){
   raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMAX", pattern = paste0(i), full.names = TRUE)), max) # MAX
-  TMAX_annual <- raster::stack(TMAX_annual, raster)
+  TXMC <- raster::stack(TXMC, raster)
 }
-names(TMAX_annual) <- paste0("Y_", seq(1979, 2019, by = 1))
+names(TXMC) <- paste0("Y_", seq(1979, 2019, by = 1))
 
 ### TNMF ----
-TMIN_annual <- raster::stack()
+TNMF <- raster::stack()
 for (i in 1979:2019){
   raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i), full.names = TRUE)), min) # MIN
-  TMIN_annual <- raster::stack(TMIN_annual, raster)
+  TNMF <- raster::stack(TNMF, raster)
 }
-names(TMIN_annual) <- paste0("Y_", seq(1979, 2019, by = 1))
+names(TNMF) <- paste0("Y_", seq(1979, 2019, by = 1))
 
 ## Prepare transects data ----
 
