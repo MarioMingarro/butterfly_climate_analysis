@@ -112,7 +112,8 @@ for (i in 1:length(CHELSA_dwld_paths)){
   raster <- raster %>%
     crop(mask) %>%
     mask(mask)
-  raster <- raster/100
+  raster <- raster/10
+  raster <- raster - 273.15
   
   writeRaster(raster,
               paste0(data_rep,
@@ -153,7 +154,8 @@ for (i in 1:length(CHELSA_dwld_paths)){
   raster <- raster %>%
     crop(mask) %>%
     mask(mask)
-  raster <- raster/100
+  raster <- raster/10
+  raster <- raster - 273.15
   
   writeRaster(raster,
               paste0(data_rep,
