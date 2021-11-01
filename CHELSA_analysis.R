@@ -189,42 +189,6 @@ for (i in 1979:2019){
 
 # Working with data ----
 
-## Monthly data to annual average ----
-
-
-### TMED ----
-TMED_annual <- raster::stack()
-for (i in 1979:2019){
-  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMED", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
-  TMED_annual <- raster::stack(TMED_annual, raster)
-}
-names(TMED_annual) <- paste0("Y_", seq(1979, 2019, by = 1))
-
-### PCP ----
-PCP_annual <- raster::stack()
-for (i in 1979:2018){
-  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/PCP", pattern = paste0(i), full.names = TRUE)), sum)#SUM
-  PCP_annual <- raster::stack(PCP_annual, raster)
-}
-names(PCP_annual) <- paste0("Y_", seq(1979, 2018, by = 1))
-plot(PCP_annual$Y_1997)
-
-### TXMC ----
-TXMC <- raster::stack()
-for (i in 1979:2019){
-  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMAX", pattern = paste0(i), full.names = TRUE)), max) # MAX
-  TXMC <- raster::stack(TXMC, raster)
-}
-names(TXMC) <- paste0("Y_", seq(1979, 2019, by = 1))
-
-### TNMF ----
-TNMF <- raster::stack()
-for (i in 1979:2019){
-  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i), full.names = TRUE)), min) # MIN
-  TNMF <- raster::stack(TNMF, raster)
-}
-names(TNMF) <- paste0("Y_", seq(1979, 2019, by = 1))
-
 ## Prepare transects data ----
 
 transect <- readOGR("Data/TRANSECTS_2021_v2.kml")
@@ -236,21 +200,29 @@ Transects_with_elevations <- Transects_with_elevations %>%
 transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
 transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations, by = "Name")
+
 ## TMED ----
+### Monthly data to annual average ----
+TMED <- raster::stack()
+for (i in 1979:2019){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMED", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
+  TMED <- raster::stack(TMED, raster)
+}
+names(TMED) <- paste0("Y_", seq(1979, 2019, by = 1))
 ### Select data for specific periods ----
 
-TMED_1985_1989 <- raster::subset(TMED_annual, grep(c("1985|1986|1987|1988|1989"), names(TMED_annual), value = T))
+TMED_1985_1989 <- raster::subset(TMED, grep(c("1985|1986|1987|1988|1989"), names(TMED), value = T))
 
-TMED_2000_2004 <- raster::subset(TMED_annual, grep(c("2000|2001|2002|2003|2004"), names(TMED_annual), value = T))
+TMED_2000_2004 <- raster::subset(TMED, grep(c("2000|2001|2002|2003|2004"), names(TMED), value = T))
 
-TMED_2015_2019 <- raster::subset(TMED_annual, grep(c("2015|2016|2017|2018|2019"), names(TMED_annual), value = T))
+TMED_2015_2019 <- raster::subset(TMED, grep(c("2015|2016|2017|2018|2019"), names(TMED), value = T))
 
 
-TMED_1981_1990 <- raster::subset(TMED_annual, grep(c("1981|1982|1983|1984|1985|1986|1987|1988|1989|1990"), names(TMED_annual), value = T))
+TMED_1981_1990 <- raster::subset(TMED, grep(c("1981|1982|1983|1984|1985|1986|1987|1988|1989|1990"), names(TMED), value = T))
 
-TMED_1996_2005 <- raster::subset(TMED_annual, grep(c("1996|1997|1998|1999|2000|2001|2002|2003|2004|2005"), names(TMED_annual), value = T))
+TMED_1996_2005 <- raster::subset(TMED, grep(c("1996|1997|1998|1999|2000|2001|2002|2003|2004|2005"), names(TMED), value = T))
 
-TMED_2010_2019 <- raster::subset(TMED_annual, grep(c("2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"), names(TMED_annual), value = T))
+TMED_2010_2019 <- raster::subset(TMED, grep(c("2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"), names(TMED), value = T))
 
 ### Calculate mean a standard deviation for diferent periods ----
 
@@ -273,8 +245,38 @@ TMED_mean_2010_2019 <- calc(TMED_2010_2019, mean)
 TMED_sd_2010_2019 <- calc(TMED_2010_2019, sd)
 
 
-### Comparing TMED 2015-2018 vs 2015-2019 ----
+### Extract data for each centroid ----
+transect_centr_TMED <- transect_centr
 
+transect_centr_TMED$mean_1985_1989 <- raster::extract(TMED_mean_1985_1989,
+                                                      transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$sd_1985_1989 <- raster::extract(TMED_sd_1985_1989,
+                                                    transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$mean_2000_2004 <- raster::extract(TMED_mean_2000_2004,
+                                                      transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$sd_2000_2004 <- raster::extract(TMED_sd_2000_2004,
+                                                    transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$mean_2015_2019 <- raster::extract(TMED_mean_2015_2019,
+                                                      transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$sd_2015_2019 <- raster::extract(TMED_sd_2015_2019,
+                                                    transect_centr_TMED, buffer = NULL ,exact = TRUE)
+
+transect_centr_TMED$mean_1981_1990 <- raster::extract(TMED_mean_1981_1990,
+                                                      transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$sd_1981_1990 <- raster::extract(TMED_sd_1981_1990,
+                                                    transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$mean_1996_2005 <- raster::extract(TMED_mean_1996_2005,
+                                                      transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$sd_1996_2005 <- raster::extract(TMED_sd_1996_2005,
+                                                    transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$mean_2010_2019 <- raster::extract(TMED_mean_2010_2019,
+                                                      transect_centr_TMED, buffer = NULL ,exact = TRUE)
+transect_centr_TMED$sd_2010_2019 <- raster::extract(TMED_sd_2010_2019,
+                                                    transect_centr_TMED, buffer = NULL ,exact = TRUE)
+
+write_xlsx(transect_centr_TMED@data, "Results/Temperature_transects_results.xlsx")
+
+### Comparing TMED 2015-2018 vs 2015-2019 ----
 TMED_2015_2018 <- raster::subset(TMED_annual, grep(c("2015|2016|2017|2018"), names(TMED_annual), value = T))
 TMED_2015_2019 <- raster::subset(TMED_annual, grep(c("2015|2016|2017|2018|2019"), names(TMED_annual), value = T))
 
@@ -285,7 +287,6 @@ TMED_mean_2015_2019 <- calc(TMED_2015_2019, mean)
 TMED_sd_2015_2019 <- calc(TMED_2015_2019, sd)
 
 ##package diffeR
-
 CrossTab_mean <- as.tibble(crosstabm(TMED_mean_2015_2019, TMED_mean_2015_2018, percent = TRUE))
 write_xlsx(CrossTab_mean, "Results/CrossTab_tmed_2015_2018_vs_2015_2019.xlsx")
 MADscatterplot(TMED_mean_2015_2018,TMED_mean_2015_2019)
@@ -297,42 +298,18 @@ MADscatterplot(TMED_sd_2015_2018,TMED_sd_2015_2019)
 
 
 
-### Extract data for each centroid ----
-transect_centr_TMED <- transect_centr
-
-transect_centr_TMED$mean_1985_1989 <- raster::extract(TMED_mean_1985_1989,
-                                                 transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$sd_1985_1989 <- raster::extract(TMED_sd_1985_1989,
-                                                 transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$mean_2000_2004 <- raster::extract(TMED_mean_2000_2004,
-                                                 transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$sd_2000_2004 <- raster::extract(TMED_sd_2000_2004,
-                                                 transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$mean_2015_2019 <- raster::extract(TMED_mean_2015_2019,
-                                                 transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$sd_2015_2019 <- raster::extract(TMED_sd_2015_2019,
-                                                 transect_centr_TMED, buffer = NULL ,exact = TRUE)
-
-transect_centr_TMED$mean_1981_1990 <- raster::extract(TMED_mean_1981_1990,
-                                                     transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$sd_1981_1990 <- raster::extract(TMED_sd_1981_1990,
-                                                   transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$mean_1996_2005 <- raster::extract(TMED_mean_1996_2005,
-                                                     transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$sd_1996_2005 <- raster::extract(TMED_sd_1996_2005,
-                                                   transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$mean_2010_2019 <- raster::extract(TMED_mean_2010_2019,
-                                                     transect_centr_TMED, buffer = NULL ,exact = TRUE)
-transect_centr_TMED$sd_2010_2019 <- raster::extract(TMED_sd_2010_2019,
-                                                   transect_centr_TMED, buffer = NULL ,exact = TRUE)
-
-write_xlsx(transect_centr_TMED@data, "Results/Temperature_transects_results.xlsx")
 
 
 ## PCP ----
+### Monthly data to annual average ----
+PCP_annual <- raster::stack()
+for (i in 1979:2018){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/PCP", pattern = paste0(i), full.names = TRUE)), sum)#SUM
+  PCP_annual <- raster::stack(PCP_annual, raster)
+}
+names(PCP_annual) <- paste0("Y_", seq(1979, 2018, by = 1))
+
 ### Select data for specific periods ----
-
-
 PCP_1985_1989 <- raster::subset(PCP_annual, grep(c("1985|1986|1987|1988|1989"), names(PCP_annual), value = T))
 
 PCP_2000_2004 <- raster::subset(PCP_annual, grep(c("2000|2001|2002|2003|2004"), names(PCP_annual), value = T))
@@ -348,7 +325,6 @@ PCP_1996_2005 <- raster::subset(PCP_annual, grep(c("1996|1997|1998|1999|2000|200
 PCP_2009_2018 <- raster::subset(PCP_annual, grep(c("2009|2010|2011|2012|2013|2014|2015|2016|2017|2018"), names(PCP_annual), value = T))
 
 ### Calculate mean a standard deviation for diferent periods ----
-
 PCP_mean_1985_1989 <- calc(PCP_1985_1989, mean)
 PCP_sd_1985_1989 <- calc(PCP_1985_1989, sd)
 
@@ -402,8 +378,161 @@ write_xlsx(transect_centr_PCP@data, "Results/Precipitation_transects_results.xls
 
 view(transect_centr_PCP@data)
 
+## TXMC ----
+### Monthly data to annual average ----
+TXMC <- raster::stack()
+for (i in 1979:2019){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMAX", pattern = paste0(i), full.names = TRUE)), max) # MAX
+  TXMC <- raster::stack(TXMC, raster)
+}
+names(TXMC) <- paste0("Y_", seq(1979, 2019, by = 1))
+
+### Select data for specific periods ----
+
+TXMC_1985_1989 <- raster::subset(TXMC, grep(c("1985|1986|1987|1988|1989"), names(TXMC), value = T))
+
+TXMC_2000_2004 <- raster::subset(TXMC, grep(c("2000|2001|2002|2003|2004"), names(TXMC), value = T))
+
+TXMC_2015_2019 <- raster::subset(TXMC, grep(c("2015|2016|2017|2018|2019"), names(TXMC), value = T))
+
+
+TXMC_1981_1990 <- raster::subset(TXMC, grep(c("1981|1982|1983|1984|1985|1986|1987|1988|1989|1990"), names(TXMC), value = T))
+
+TXMC_1996_2005 <- raster::subset(TXMC, grep(c("1996|1997|1998|1999|2000|2001|2002|2003|2004|2005"), names(TXMC), value = T))
+
+TXMC_2010_2019 <- raster::subset(TXMC, grep(c("2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"), names(TXMC), value = T))
+
+### Calculate mean a standard deviation for diferent periods ----
+
+TXMC_mean_1985_1989 <- calc(TXMC_1985_1989, mean)
+TXMC_sd_1985_1989 <- calc(TXMC_1985_1989, sd)
+
+TXMC_mean_2000_2004 <- calc(TXMC_2000_2004, mean)
+TXMC_sd_2000_2004 <- calc(TXMC_2000_2004, sd)
+
+TXMC_mean_2015_2019 <- calc(TXMC_2015_2019, mean)
+TXMC_sd_2015_2019 <- calc(TXMC_2015_2019, sd)
+
+TXMC_mean_1981_1990 <- calc(TXMC_1981_1990, mean)
+TXMC_sd_1981_1990 <- calc(TXMC_1981_1990, sd)
+
+TXMC_mean_1996_2005 <- calc(TXMC_1996_2005, mean)
+TXMC_sd_1996_2005 <- calc(TXMC_1996_2005, sd)
+
+TXMC_mean_2010_2019 <- calc(TXMC_2010_2019, mean)
+TXMC_sd_2010_2019 <- calc(TXMC_2010_2019, sd)
+
+
+### Extract data for each centroid ----
+transect_centr_TXMC <- transect_centr
+
+transect_centr_TXMC$mean_1985_1989 <- raster::extract(TXMC_mean_1985_1989,
+                                                      transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$sd_1985_1989 <- raster::extract(TXMC_sd_1985_1989,
+                                                    transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$mean_2000_2004 <- raster::extract(TXMC_mean_2000_2004,
+                                                      transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$sd_2000_2004 <- raster::extract(TXMC_sd_2000_2004,
+                                                    transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$mean_2015_2019 <- raster::extract(TXMC_mean_2015_2019,
+                                                      transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$sd_2015_2019 <- raster::extract(TXMC_sd_2015_2019,
+                                                    transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+
+transect_centr_TXMC$mean_1981_1990 <- raster::extract(TXMC_mean_1981_1990,
+                                                      transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$sd_1981_1990 <- raster::extract(TXMC_sd_1981_1990,
+                                                    transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$mean_1996_2005 <- raster::extract(TXMC_mean_1996_2005,
+                                                      transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$sd_1996_2005 <- raster::extract(TXMC_sd_1996_2005,
+                                                    transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$mean_2010_2019 <- raster::extract(TXMC_mean_2010_2019,
+                                                      transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+transect_centr_TXMC$sd_2010_2019 <- raster::extract(TXMC_sd_2010_2019,
+                                                    transect_centr_TXMC, buffer = NULL ,exact = TRUE)
+
+write_xlsx(transect_centr_TXMC@data, "Results/Max_temp_warmest_month_transects_results.xlsx")
+
+## TNMF ----
+### Monthly data to annual average ----
+TNMF <- raster::stack()
+for (i in 1979:2019){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i), full.names = TRUE)), min) # MIN
+  TNMF <- raster::stack(TNMF, raster)
+}
+names(TNMF) <- paste0("Y_", seq(1979, 2019, by = 1))
+
+### Select data for specific periods ----
+
+TNMF_1985_1989 <- raster::subset(TNMF, grep(c("1985|1986|1987|1988|1989"), names(TNMF), value = T))
+
+TNMF_2000_2004 <- raster::subset(TNMF, grep(c("2000|2001|2002|2003|2004"), names(TNMF), value = T))
+
+TNMF_2015_2019 <- raster::subset(TNMF, grep(c("2015|2016|2017|2018|2019"), names(TNMF), value = T))
+
+
+TNMF_1981_1990 <- raster::subset(TNMF, grep(c("1981|1982|1983|1984|1985|1986|1987|1988|1989|1990"), names(TNMF), value = T))
+
+TNMF_1996_2005 <- raster::subset(TNMF, grep(c("1996|1997|1998|1999|2000|2001|2002|2003|2004|2005"), names(TNMF), value = T))
+
+TNMF_2010_2019 <- raster::subset(TNMF, grep(c("2010|2011|2012|2013|2014|2015|2016|2017|2018|2019"), names(TNMF), value = T))
+
+### Calculate mean a standard deviation for diferent periods ----
+
+TNMF_mean_1985_1989 <- calc(TNMF_1985_1989, mean)
+TNMF_sd_1985_1989 <- calc(TNMF_1985_1989, sd)
+
+TNMF_mean_2000_2004 <- calc(TNMF_2000_2004, mean)
+TNMF_sd_2000_2004 <- calc(TNMF_2000_2004, sd)
+
+TNMF_mean_2015_2019 <- calc(TNMF_2015_2019, mean)
+TNMF_sd_2015_2019 <- calc(TNMF_2015_2019, sd)
+
+TNMF_mean_1981_1990 <- calc(TNMF_1981_1990, mean)
+TNMF_sd_1981_1990 <- calc(TNMF_1981_1990, sd)
+
+TNMF_mean_1996_2005 <- calc(TNMF_1996_2005, mean)
+TNMF_sd_1996_2005 <- calc(TNMF_1996_2005, sd)
+
+TNMF_mean_2010_2019 <- calc(TNMF_2010_2019, mean)
+TNMF_sd_2010_2019 <- calc(TNMF_2010_2019, sd)
+
+
+### Extract data for each centroid ----
+transect_centr_TNMF <- transect_centr
+
+transect_centr_TNMF$mean_1985_1989 <- raster::extract(TNMF_mean_1985_1989,
+                                                      transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$sd_1985_1989 <- raster::extract(TNMF_sd_1985_1989,
+                                                    transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$mean_2000_2004 <- raster::extract(TNMF_mean_2000_2004,
+                                                      transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$sd_2000_2004 <- raster::extract(TNMF_sd_2000_2004,
+                                                    transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$mean_2015_2019 <- raster::extract(TNMF_mean_2015_2019,
+                                                      transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$sd_2015_2019 <- raster::extract(TNMF_sd_2015_2019,
+                                                    transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+
+transect_centr_TNMF$mean_1981_1990 <- raster::extract(TNMF_mean_1981_1990,
+                                                      transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$sd_1981_1990 <- raster::extract(TNMF_sd_1981_1990,
+                                                    transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$mean_1996_2005 <- raster::extract(TNMF_mean_1996_2005,
+                                                      transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$sd_1996_2005 <- raster::extract(TNMF_sd_1996_2005,
+                                                    transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$mean_2010_2019 <- raster::extract(TNMF_mean_2010_2019,
+                                                      transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+transect_centr_TNMF$sd_2010_2019 <- raster::extract(TNMF_sd_2010_2019,
+                                                    transect_centr_TNMF, buffer = NULL ,exact = TRUE)
+
+write_xlsx(transect_centr_TNMF@data, "Results/Min_temp_coldest_month_transects_results.xlsx")
+
 
 # Some fast plots ----
+## TMED
 
 # Create a theme
 theme_plot <- theme(legend.position = "none",
