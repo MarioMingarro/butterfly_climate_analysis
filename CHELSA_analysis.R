@@ -872,15 +872,15 @@ ggarrange(p_sd_1981_1990, p_sd_1985_1989, p_sd_1996_2005, p_sd_2000_2004, p_sd_2
 
 #### Scatterplot TNMF_vs elevation ----
 for (i in 1:6){
-  p <- ggplot(TNMF_T, aes_string("Alt", names[i], col = "ZONE", fill = "ZONE"))+
-    geom_point()+
-    geom_smooth()+
-    facet_wrap(~ZONE)+
+  p <- ggplot(TNMF_T, aes_string("Alt", names[i], col = "ZONE", fill = "ZONE")) +
+    geom_point() +
+    geom_smooth() +
+    facet_wrap(~ ZONE) +
     labs(y = "ºC",
          x = "m",
-         title=paste0("TNCM_",names[i]))+
+         title = paste0("TNCM_", names[i])) +
     theme(legend.position = "none")
-  assign(paste0("p_",names[i]), p)
+  assign(paste0("p_", names[i]), p)
 }
 
 ggarrange(p_sd_1981_1990, p_sd_1985_1989, p_sd_1996_2005, p_sd_2000_2004, p_sd_2010_2019, p_sd_2015_2019,
