@@ -532,40 +532,118 @@ write_xlsx(transect_centr_TNMF@data, "Results/Min_temp_coldest_month_transects_r
 
 
 # Some fast plots ----
+
+
 ## TMED ----
 
-# Create a theme
-theme_plot <- theme(legend.position = "none",
-                    axis.title.x = element_blank(),
-                    axis.text.x = element_blank(),
-                    axis.title.y = element_blank())
+TMED_T <- transect_centr_TMED@data
 
-# Create plots
-pcp <- transect_centr_PCP@data
+# Create a legend
+legend <- get_legend(ggplot(TMED_T_s, aes(ZONE,value))+
+                       geom_violin(aes(fill= ZONE))+
+                       scale_fill_discrete(name = "Mean\nTemperature"))
 
-names <- c("mean_1985_1989", "mean_2000_2004","mean_2015_2018",
-           "mean_1981_1990","mean_1996_2005" ,"mean_2009_2018" )
+legend <- as_ggplot(legend)
+
+### Mean ----
+#### Boxplot----
+names <- c("mean_1985_1989", "mean_2000_2004","mean_2015_2019",
+           "mean_1981_1990","mean_1996_2005" ,"mean_2010_2019" )
 for (i in names){
-  pcp2 <-  select(pcp, Name, ZONE, i)
-  pcp_long <- melt(pcp2)
-  p <- ggplot(pcp_long, aes(ZONE,value))+
+  TMED_T_s <-  select(TMED_T, Name, ZONE, i)
+  TMED_T_s <- melt(TMED_T_s)
+  p <- ggplot(TMED_T_s, aes(ZONE,value))+
     geom_violin(aes(fill= ZONE))+
     geom_boxplot(width=0.1, fill = "gray80")+
     labs(y="mm",
-         title=paste0("p_",i))+
-    scale_y_continuous("mm",c(400,600,800,1000,1200,1400,1600, 1800,2000), limits = c(400,2000))+
-    theme_plot
+         title=paste0("T_",i))+
+    scale_y_continuous("ºC",c(4,6,8,10,12,14,16,18), limits = c(4,18))+
+    theme(legend.position = "none",
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.title.y = element_blank())
   assign(paste0("p_",i), p)
 }
 
-# Create a legend
-legend_mean <- get_legend(ggplot(pcp_long, aes(ZONE,value))+
-                            geom_violin(aes(fill= ZONE))+
-                            scale_fill_discrete(name = "Annual\nprecipitation"))
 
-legend_mean <- as_ggplot(legend_mean)
+# Multiple plot
+ggarrange(p_mean_1981_1990, p_mean_1985_1989, p_mean_1996_2005, p_mean_2000_2004, p_mean_2010_2019, p_mean_2015_2019,
+          ncol = 3, nrow = 2)
 
-# multiple plot
-ggarrange(p_mean_1981_1990, p_mean_1985_1989, p_mean_1996_2005, p_mean_2000_2004, p_mean_2009_2018, p_mean_2015_2018,
-          ncol = 3, nrow = 3, legend_mean)
+#### Scatterplot tmed_vs elevation ----
 
+names <- c("mean_1985_1989", "mean_2000_2004","mean_2015_2019",
+           "mean_1981_1990","mean_1996_2005" ,"mean_2010_2019" )
+
+ggplot(TMED_T, aes(Alt, mean_1985_1989, col = ZONE, fill = ZONE))+
+  geom_point()+
+  geom_smooth()+
+  facet_wrap(~ZONE)+
+  labs(y = "ºC",
+       x = "m",
+       title=paste0("T_",i))+
+  theme(legend.position = "none")
+
+
+for (i in names){
+  p <- ggplot(TMED_T, aes(Alt, mean_1985_1989, col = ZONE, fill = ZONE))+
+    geom_point()+
+    geom_smooth()+
+    facet_wrap(~ZONE)+
+    labs(y = "ºC",
+         x = "m",
+         title=paste0("T_",i))+
+    theme(legend.position = "none")
+  assign(paste0("p_",i), p)
+}
+
+
+ggarrange(p_mean_1981_1990, p_mean_1985_1989, p_mean_1996_2005, p_mean_2000_2004, p_mean_2010_2019, p_mean_2015_2019,
+          ncol = 3, nrow = 2)
+
+### Sd ----
+#### Boxplot ----
+names <- c("sd_1985_1989", "sd_2000_2004","sd_2015_2019",
+           "sd_1981_1990","sd_1996_2005" ,"sd_2010_2019" )
+for (i in names){
+  TMED_T_s <-  select(TMED_T, Name, ZONE, i)
+  TMED_T_s <- melt(TMED_T_s)
+  p <- ggplot(TMED_T_s, aes(ZONE,value))+
+    geom_violin(aes(fill= ZONE))+
+    geom_boxplot(width=0.1, fill = "gray80")+
+    labs(y="mm",
+         title=paste0("T_",i))+
+    scale_y_continuous("ºC", limits = c(0.17,1.2))+
+    theme(legend.position = "none",
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.title.y = element_blank())
+  assign(paste0("p_",i), p)
+}
+
+
+# Multiple plot
+ggarrange(p_sd_1981_1990, p_sd_1985_1989, p_sd_1996_2005, p_sd_2000_2004, p_sd_2010_2019, p_sd_2015_2019,
+          ncol = 3, nrow = 2)
+
+### Scatterplot tmed_vs elevation
+
+names <- c("sd_1985_1989", "sd_2000_2004","sd_2015_2019",
+           "sd_1981_1990","sd_1996_2005" ,"sd_2010_2019" )
+
+
+for (i in names){
+  p <- ggplot(TMED_T, aes(Alt, sd_1985_1989, col = ZONE, fill = ZONE))+
+    geom_point()+
+    geom_smooth()+
+    facet_wrap(~ZONE)+
+    labs(y = "ºC",
+         x = "m",
+         title=paste0("T_",i))+
+    theme(legend.position = "none")
+  assign(paste0("p_",i), p)
+}
+
+
+ggarrange(p_sd_1981_1990, p_sd_1985_1989, p_sd_1996_2005, p_sd_2000_2004, p_sd_2010_2019, p_sd_2015_2019,
+          ncol = 3, nrow = 2)
