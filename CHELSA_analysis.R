@@ -575,26 +575,17 @@ ggarrange(p_mean_1981_1990, p_mean_1985_1989, p_mean_1996_2005, p_mean_2000_2004
 names <- c("mean_1985_1989", "mean_2000_2004","mean_2015_2019",
            "mean_1981_1990","mean_1996_2005" ,"mean_2010_2019" )
 
-ggplot(TMED_T, aes(Alt, mean_1985_1989, col = ZONE, fill = ZONE))+
-  geom_point()+
-  geom_smooth()+
-  facet_wrap(~ZONE)+
-  labs(y = "ºC",
-       x = "m",
-       title=paste0("T_",i))+
-  theme(legend.position = "none")
 
-
-for (i in names){
-  p <- ggplot(TMED_T, aes(Alt, mean_1985_1989, col = ZONE, fill = ZONE))+
+for (i in 1:6){
+  p <- ggplot(TMED_T, aes_string("Alt", names[i], col = "ZONE", fill = "ZONE"))+
     geom_point()+
     geom_smooth()+
     facet_wrap(~ZONE)+
     labs(y = "ºC",
          x = "m",
-         title=paste0("T_",i))+
+         title=paste0("T_",names[i]))+
     theme(legend.position = "none")
-  assign(paste0("p_",i), p)
+  assign(paste0("p_",names[i]), p)
 }
 
 
@@ -633,7 +624,7 @@ names <- c("sd_1985_1989", "sd_2000_2004","sd_2015_2019",
 
 
 for (i in names){
-  p <- ggplot(TMED_T, aes(Alt, sd_1985_1989, col = ZONE, fill = ZONE))+
+  p <- ggplot(TMED_T, aes(Alt, i, col = ZONE, fill = ZONE))+
     geom_point()+
     geom_smooth()+
     facet_wrap(~ZONE)+
