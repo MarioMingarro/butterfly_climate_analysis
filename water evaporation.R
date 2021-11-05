@@ -44,9 +44,8 @@ for (i in 1:length(CHELSA_dwld_paths)){
                              unlist(gregexpr("_V.2", CHELSA_dwld_paths[i])) - 1), ".tif"))
 }
 
-download.file(TERRACLIMATE_dwld_paths[1],
-             dest = "kk.nc",
-             mode="wb")
+
+
 raster <- raster("raster.tif")
 plot(raster[[1]])
 projection(raster) <-  CRS("+init=epsg:4326")
@@ -67,3 +66,31 @@ dim(kk)
 kk.slice <- kk[, , 12] 
 r <- raster(t(kk.slice), xmn=min(lon), xmx=max(lon), ymn=min(lat), ymx=max(lat), crs=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
 plot(r[[2]])
+##-----------------
+library(raster)
+
+download.file(TERRACLIMATE_dwld_paths[1],
+              dest = "kk.nc",
+              mode="wb")
+
+nc_data <- nc_open("kk.nc")
+lon <- ncvar_get(nc_data, "lon")
+lat <- ncvar_get(nc_data, "lat", verbose = F)
+t <- ncvar_get(nc_data, "time")
+print(nc_data)
+solar_array <- ncvar_get(nc_data,nc_data$var$srad)
+dim(solar_array)
+solar_stack <-  raster::stack()
+for (i in 1:12){
+  solar_array.slice <- solar_array[, , i] 
+  r <- raster(t(solar_array.slice), xmn=min(lon), xmx=max(lon), ymn=min(lat), ymx=max(lat), crs=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
+  r <- crop(r, mask)
+  r <- raster::mask(r, mask)
+  solar_stack <- raster::stack(solar_stack, r)
+  
+}
+names(solar_stack) <- c("enero","febrero", "marzo", "abril", "mayo", "Junio", "julio", "agosto", "septiembre", "o", "n", "d")
+plot(solar_stack[[1]])
+res(solar_stack)
+mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
+mask <- spTransform(mask, "+init=epsg:4326")
