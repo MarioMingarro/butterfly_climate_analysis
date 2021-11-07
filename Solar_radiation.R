@@ -9,8 +9,8 @@ TERRACLIMATE_dwld_paths <- readLines("TERRACLIMATE_dwld_paths_srad.txt")
 data_rep <- "B:/DATA/SOLAR/SPAIN/"
 
 library(ncdf4)#:length(TERRACLIMATE_dwld_paths)
-for (k in 1){
-  download.file(TERRACLIMATE_dwld_paths[1],
+for (k in 1:length(TERRACLIMATE_dwld_paths)){
+  download.file(TERRACLIMATE_dwld_paths[k],
                 dest = "raster.nc",
                 mode="wb")
   
@@ -38,18 +38,3 @@ for (k in 1){
                                            unlist(gregexpr(".nc",TERRACLIMATE_dwld_paths[k])) - 1), ".tif"))
 }
 
-paste0("B:/CHELSA_DATA/TMED/",
-       str_sub(list.files("B:/CHELSA_DATA/TMED"), 8,11),
-       "_",
-       str_sub(list.files("B:/CHELSA_DATA/TMED"), 5,6),
-       ".tif"
-
-       paste0(data_rep,
-              str_sub(TERRACLIMATE_dwld_paths[1],
-                      unlist(gregexpr("srad_", TERRACLIMATE_dwld_paths[1])),
-                      unlist(gregexpr(".nc",TERRACLIMATE_dwld_paths[1])) - 1), ".tif")
-
-
-names(solar_stack) <- c("enero","febrero", "marzo", "abril", "mayo", "Junio", "julio", "agosto", "septiembre", "o", "n", "d")
-plot(solar_stack[[1]])
-res(solar_stack)
