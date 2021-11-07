@@ -1,3 +1,4 @@
+https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_srad_1980.nc 
 https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_srad_1981.nc 
 https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_srad_1982.nc 
 https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_srad_1983.nc 
