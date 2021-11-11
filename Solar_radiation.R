@@ -1,14 +1,14 @@
 # Clean and load packages ----
+closeAllConnections()
 rm(list=(ls()[ls()!="v"]))
 gc(reset=TRUE)
+
 source("Dependencies/Functions.R")
 
 mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
 mask <- spTransform(mask, "+init=epsg:4326")
 TERRACLIMATE_dwld_paths <- readLines("TERRACLIMATE_dwld_paths_srad.txt")
 data_rep <- "B:/DATA/SOLAR/SPAIN/"
-k = 2
-i = 1
 
 
 library(ncdf4)#:length(TERRACLIMATE_dwld_paths)
@@ -22,8 +22,8 @@ for (k in 1:length(TERRACLIMATE_dwld_paths)){
   lat <- ncvar_get(nc_data, "lat", verbose = F)
   t <- ncvar_get(nc_data, "time")
   
-  solar_array <- ncvar_get(nc_data, "srad","long_name")
-  
+  #solar_array <- ncvar_get(nc_data, "srad","long_name")
+  solar_array <- ncvar_get(nc_data, attributes(nc_data$var)$names)
   solar_stack <-  raster::stack()
   
   for (i in 1:12){
@@ -39,5 +39,7 @@ for (k in 1:length(TERRACLIMATE_dwld_paths)){
                                    str_sub(TERRACLIMATE_dwld_paths[k],
                                            unlist(gregexpr("srad_", TERRACLIMATE_dwld_paths[k])),
                                            unlist(gregexpr(".nc",TERRACLIMATE_dwld_paths[k])) - 1), ".tif"))
+  nc_close(nc_data)
 }
-
+class(nc_data)
+nc_close(nc_data)
