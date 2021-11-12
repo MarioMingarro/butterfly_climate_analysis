@@ -10,11 +10,11 @@ mask <- spTransform(mask, "+init=epsg:4326")
 TERRACLIMATE_dwld_paths <- readLines("TERRACLIMATE_dwld_paths_srad.txt")
 data_rep <- "B:/DATA/SOLAR/SPAIN/"
 
-
+k=1
 library(ncdf4)#:length(TERRACLIMATE_dwld_paths)
 for (k in 1:2){
   download.file(TERRACLIMATE_dwld_paths[k],
-                dest = "raster.nc",
+                dest = "A:/CCMAR/TEST/raster.nc",
                 mode="wb")
   
   nc_data <- nc_open("raster.nc")
