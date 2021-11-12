@@ -12,7 +12,7 @@ data_rep <- "B:/DATA/SOLAR/SPAIN/"
 
 
 library(ncdf4)#:length(TERRACLIMATE_dwld_paths)
-for (k in 1:length(TERRACLIMATE_dwld_paths)){
+for (k in 1:2){
   download.file(TERRACLIMATE_dwld_paths[k],
                 dest = "raster.nc",
                 mode="wb")
