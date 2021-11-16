@@ -3,7 +3,7 @@ closeAllConnections()
 rm(list=(ls()[ls()!="v"]))
 gc(reset=TRUE)
 source("Dependencies/Functions.R")
-devtools::install_github('mrke/NicheMapR')
+
 
 # Transects------
 transect <- readOGR("Data/TRANSECTS_2021_v2.kml")
@@ -15,43 +15,34 @@ Transects_with_elevations <- Transects_with_elevations %>%
 transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
 transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations, by = "Name")
-CRS(transect_centr)
-writeOGR(transect_centr,)
+rm(transect)
+rm(Transects_with_elevations)
 
-C_1x1KM <- readOGR("./Cuadriculas_seleccionadas.shp") %>%
-  spTransform(CRS("+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"))
 
-UTM_ALT <- as.tibble(mutate(as.data.frame(C_1x1KM$COD5X5),as.data.frame(C_1x1KM$Shape_Area)))%>%
-  rename(COD_UTM = `C_1x1KM$COD5X5`,
-         AREA = `C_1x1KM$Shape_Area`)
-nombre_UTM <- data.frame(UTM_ALT[,1])
 
-centr <- st_as_sf(C_1x1KM) %>%
-  st_centroid()%>%
-  as_Spatial()%>%
-  spTransform(CRS("+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"))
 
-lat_long <- coordinates(spTransform(centr, CRS("+proj=longlat + datum=WGS84")))
+lat_long <- coordinates(spTransform(transect_centr, CRS("+proj=longlat + datum=WGS84")))
 lat_comp <- lat_long[,2]
 long_comp <- lat_long[,1]
 
-fi <- seq(as.Date("2019-01-01"), length=120, by="month")
-ff <- seq(as.Date("2019-02-01"), length=120, by="month")-1
+fi <- seq(as.Date("1980-01-01"), length=120, by="month")
+ff <- seq(as.Date("1980-02-01"), length=120, by="month")-1
 
 
 f_inicio <- data.frame(fecha_mal = fi) %>% 
-  separate(fecha_mal, into = c("dia", "mes", "a?o")) %>%
-  mutate(fecha_bien = paste(a?o, mes, dia, sep = "/")) %>%
+  separate(fecha_mal, into = c("dia", "mes", "año")) %>%
+  mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
   dplyr::select(fecha_bien)
 
 f_fin <- data.frame(fecha_mal = ff) %>% 
-  separate(fecha_mal, into = c("dia", "mes", "a?o")) %>%
-  mutate(fecha_bien = paste(a?o, mes, dia, sep = "/")) %>%
+  separate(fecha_mal, into = c("dia", "mes", "año")) %>%
+  mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
   dplyr::select(fecha_bien)
 
-tic("Tiempo ejecuci?n total: ") 
 
-for (j in 4){
+tic("Tiempo ejecucion total: ") 
+
+for (j in 1){
   lat <- lat_comp[j]
   long <- long_comp[j]
   mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
@@ -66,16 +57,44 @@ for (j in 4){
     tmax <- temp$tmax
     tmin <-temp$tmin
     tmed <- temp$tmean
-    writeRaster(tmax, paste0("./tmax_",
-                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_",nombre_UTM[j,],"_H2",".tif"))), overwrite=TRUE)
-    writeRaster(tmin, paste0("./tmin_",
-                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_",nombre_UTM[j,],"_H2",".tif"))), overwrite=TRUE)
-    writeRaster(tmed, paste0("./tmed_",
-                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_",nombre_UTM[j,],"_H2",".tif"))), overwrite=TRUE)
+    writeRaster(tmax, paste0("B:/CHELSA_DATA/MICRO/tmax_",
+                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_","_H2",".tif"))), overwrite=TRUE)
+    writeRaster(tmin, paste0("B:/CHELSA_DATA/MICRO/tmin_",
+                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_","_H2",".tif"))), overwrite=TRUE)
+    writeRaster(tmed, paste0("B:/CHELSA_DATA/MICRO/tmed_",    
+                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_","_H2",".tif"))), overwrite=TRUE)
   }
 }
 toc()
 
+raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/MICRO/", pattern = "tmax", full.names = TRUE)), mean)
+
+
+
+
+plot(raster)
+names(TMED) <- paste0("Y_", seq(1979, 2019, by = 1))
+
+#--------------------------------------------
+file.ls <- list.files("B:/CHELSA_DATA/MICRO/", pattern= "tmax", full.names = TRUE)
+Filter(function(x) grepl(paste0(i), x), file.ls)
+paste0("tmax*", i)
+#--------------------------------------
+for (j in 31:length(transect_centr)){
+  lat <- lat_comp[j]
+  long <- long_comp[j]
+  mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
+  e <- extent(mdt)
+  p <- as(e, 'SpatialPolygons') 
+  projection(p) = CRS(proj4string(transect_centr))
+  shapefile(p, paste0("B:/CHELSA_DATA/POLY/pol_Rascafria_Raso de la Cierva.shp" ))
+}
+
+proj4string(transect_centr) = CRS("+init=epsg:4326")
+shapefile(transect_centr, paste0("B:/CHELSA_DATA/POLY/transect_centr.shp" ))
+
+
+transect_centr$Name
 ###ESTADISTICAS
 
 Nombres<- c("30TUK15B","30TVL11C","30TXK17D","30TXK64D")
