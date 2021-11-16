@@ -69,8 +69,11 @@ toc()
 
 raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/MICRO/", pattern = "tmax", full.names = TRUE)), mean)
 
+transect_centr_test <- transect_centr
+transect_centr_test$mean_1980_1989 <- raster::extract(raster,
+                                                      transect_centr_test, buffer = NULL ,exact = TRUE)
 
-
+write_xlsx(transect_centr_test@data, "Results/test_microclima_transects_results.xlsx")
 
 plot(raster)
 names(TMED) <- paste0("Y_", seq(1979, 2019, by = 1))
