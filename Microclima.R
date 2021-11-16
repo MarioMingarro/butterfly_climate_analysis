@@ -67,13 +67,36 @@ for (j in 1){
 }
 toc()
 
-raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/MICRO/", pattern = "tmed", full.names = TRUE)), mean)
+"B:/CHELSA_DATA/chelsa_test"
 
-transect_centr_test <- transect_centr
-transect_centr_test$mean_1980_1989 <- raster::extract(raster,
-                                                      transect_centr_test, buffer = NULL ,exact = TRUE)
+raster <- raster::stack(list.files("B:/CHELSA_DATA/MICRO/", pattern = "tmed", full.names = TRUE))
 
+transect_centr_test <- transect_centr 
+
+transect_centr_test
+
+for (i in c(1,2,20)){
+  aa <- raster::extract(raster, transect_centr_test[i], buffer = NULL ,exact = TRUE)
+  transect_centr_test@data <- cbind(transect_centr_test@data, aa)
+}
+
+view(transect_centr_test@data)
 write_xlsx(transect_centr_test@data, "Results/test_microclima_transects_results.xlsx")
+
+
+raster <- raster::stack(list.files("B:/CHELSA_DATA/chelsa_test", full.names = TRUE))
+
+transect_centr_test <- transect_centr 
+
+transect_centr_test
+
+for (i in c(1,2,20)){
+  aa <- raster::extract(raster, transect_centr_test[i], buffer = NULL ,exact = TRUE)
+  transect_centr_test@data <- cbind(transect_centr_test@data, aa)
+}
+
+write_xlsx(transect_centr_test@data, "Results/test_chelsa_transects_results.xlsx")
+
 
 plot(raster)
 names(TMED) <- paste0("Y_", seq(1979, 2019, by = 1))
