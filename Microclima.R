@@ -19,11 +19,13 @@ rm(transect)
 rm(Transects_with_elevations)
 
 
-
+## Get lat and long ----
 
 lat_long <- coordinates(spTransform(transect_centr, CRS("+proj=longlat + datum=WGS84")))
 lat_comp <- lat_long[,2]
 long_comp <- lat_long[,1]
+
+## Get dates ----
 
 fi <- seq(as.Date("1980-01-01"), length=120, by="month")
 ff <- seq(as.Date("1980-02-01"), length=120, by="month")-1
@@ -39,7 +41,7 @@ f_fin <- data.frame(fecha_mal = ff) %>%
   mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
   dplyr::select(fecha_bien)
 
-
+## Run microclima ----
 tic("Tiempo ejecucion total: ") 
 
 for (j in 1){
@@ -66,86 +68,61 @@ for (j in 1){
   }
 }
 toc()
+#number                         descriptor
+# 1        Evergreen needleleaf forest
+# 2         Evergreen Broadleaf forest
+# 3        Deciduous needleleaf forest
+# 4         Deciduous broadleaf forest
+# 5                       Mixed forest
+# 6                  Closed shrublands
+# 7                    Open shrublands
+# 8                     Woody savannas
+# 9                           Savannas
+#10                   Short grasslands
+#11                    Tall grasslands
+#12                 Permanent wetlands
+#13                          Croplands
+#14                 Urban and built-up
+#15 Cropland/Natural vegetation mosaic
+#16       Barren or sparsely vegetated
+#17                         Open water
 
-"B:/CHELSA_DATA/chelsa_test"
+##--------------------------------------------------------------------------------------------------------------------------------------
 
-raster <- raster::stack(list.files("B:/CHELSA_DATA/MICRO/", pattern = "tmed", full.names = TRUE))
+##MICROCLIMA
 
-transect_centr_test <- transect_centr 
-
-transect_centr_test
-
-for (i in c(1,2,20)){
-  aa <- raster::extract(raster, transect_centr_test[i], buffer = NULL ,exact = TRUE)
-  transect_centr_test@data <- cbind(transect_centr_test@data, aa)
+TMED_m <- raster::stack()
+for (i in 1980:1989){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/MICRO/TMED", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
+  TMED_m <- raster::stack(TMED_m, raster)
 }
+names(TMED_m) <- paste0("Y_", seq(1980, 1989, by = 1))
 
-view(transect_centr_test@data)
-write_xlsx(transect_centr_test@data, "Results/test_microclima_transects_results.xlsx")
+TMED_mean_1980_1989_m <- calc(TMED_m, mean)
+
+TMED_mean_1980_1989_m <-  projectRaster(TMED_mean_1980_1989_m, crs = projection(TMED_mean_1980_1989))
 
 
-raster <- raster::stack(list.files("B:/CHELSA_DATA/chelsa_test", full.names = TRUE))
 
-transect_centr_test <- transect_centr 
 
-transect_centr_test
 
-for (i in c(1,2,20)){
-  aa <- raster::extract(raster, transect_centr_test[i], buffer = NULL ,exact = TRUE)
-  transect_centr_test@data <- cbind(transect_centr_test@data, aa)
+##CHELSA
+TMED <- raster::stack()
+for (i in 1980:1989){
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMED", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
+  TMED <- raster::stack(TMED, raster)
 }
+names(TMED) <- paste0("Y_", seq(1980, 1989, by = 1))
 
-write_xlsx(transect_centr_test@data, "Results/test_chelsa_transects_results.xlsx")
+TMED_mean_1980_1989 <- calc(TMED, mean)
 
-
-plot(raster)
-names(TMED) <- paste0("Y_", seq(1979, 2019, by = 1))
-
-#--------------------------------------------
-file.ls <- list.files("B:/CHELSA_DATA/MICRO/", pattern= "tmax", full.names = TRUE)
-Filter(function(x) grepl(paste0(i), x), file.ls)
-paste0("tmax*", i)
-#--------------------------------------
-for (j in 31:length(transect_centr)){
-  lat <- lat_comp[j]
-  long <- long_comp[j]
-  mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
-  e <- extent(mdt)
-  p <- as(e, 'SpatialPolygons') 
-  projection(p) = CRS(proj4string(transect_centr))
-  shapefile(p, paste0("B:/CHELSA_DATA/POLY/pol_Rascafria_Raso de la Cierva.shp" ))
-}
-
-proj4string(transect_centr) = CRS("+init=epsg:4326")
-shapefile(transect_centr, paste0("B:/CHELSA_DATA/POLY/transect_centr.shp" ))
+TMED_mean_1980_1989 <- crop(TMED_mean_1980_1989,TMED_mean_1980_1989_m)
 
 
-transect_centr$Name
-###ESTADISTICAS
+plot(TMED_mean_1980_1989)
+plot(transect, add=T)
+plot(TMED_mean_1980_1989_m)
+plot(transect, add=T)
 
-Nombres<- c("30TUK15B","30TVL11C","30TXK17D","30TXK64D")
-temperaturas<- c("tmax", "tmin", "tmed")
-
-
-setwd("A:/MCROCLIMA_TRANSECTOS/2010_2019")
-for(k in temperaturas){
-  for (j in Nombres){
-    for (i in 10:12){
-      lista_datos <- intersect(
-        list.files(pattern = paste0(k,"_01_", i)), 
-        list.files(pattern = j))
-      dir.create(file.path(paste0("Statistics_", k)))
-      brick_datos <- brick(stack(lista_datos))
-      media <- calc(brick_datos,mean)
-      
-      std <- calc(brick_datos, sd)
-      
-      rango <- calc(brick_datos, function(x) max(x) - min(x))
-      
-      writeRaster(media, paste0("./Statistics_",k,"/media_",k,"_",i ,"_", j,".tif"),overwrite=TRUE)
-      writeRaster(std, paste0("./Statistics_",k,"/std_",k,"_",i,"_", j,".tif"),overwrite=TRUE)
-      writeRaster(rango, paste0("./Statistics_",k,"/rango_", k, "_",i,"_", j,".tif"),overwrite=TRUE)
-    }
-  }
-  
-}
+summary(TMED_mean_1980_1989_m)
+summary(TMED_mean_1980_1989)
