@@ -93,7 +93,7 @@ toc()
 
 TMED_m <- raster::stack()
 for (i in 1980:1989){
-  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/MICRO/TMED", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/MICRO/TMAX", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
   TMED_m <- raster::stack(TMED_m, raster)
 }
 names(TMED_m) <- paste0("Y_", seq(1980, 1989, by = 1))
@@ -105,11 +105,10 @@ TMED_mean_1980_1989_m <-  projectRaster(TMED_mean_1980_1989_m, crs = projection(
 
 
 
-
 ##CHELSA
 TMED <- raster::stack()
 for (i in 1980:1989){
-  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMED", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
+  raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMAX", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
   TMED <- raster::stack(TMED, raster)
 }
 names(TMED) <- paste0("Y_", seq(1980, 1989, by = 1))
@@ -126,3 +125,58 @@ plot(transect, add=T)
 
 summary(TMED_mean_1980_1989_m)
 summary(TMED_mean_1980_1989)
+
+
+
+##MICROCLIMA
+
+raster_m <- raster::stack(list.files("B:/CHELSA_DATA/MICRO/TMIN", full.names = TRUE))
+raster_m <-  projectRaster(raster_m, crs = "+proj=longlat +datum=WGS84 +no_defs")
+
+
+##CHELSA
+raster_c <- raster::stack()
+for (i in 1980:1989){
+  raster <- raster::stack(list.files("B:/CHELSA_DATA/TMIN", pattern = paste0(i), full.names = TRUE))
+  raster_c <- raster::stack(raster_c, raster)
+}
+
+raster_c <- crop(raster_c,raster_m[[1]])
+
+##Comparation
+ext <- as(extent(raster_m[[1]]), "SpatialPolygons")
+random_points <- spsample(ext, n=5, type='random')
+proj4string(random_points) = CRS("+proj=longlat +datum=WGS84 +no_defs")
+
+m_results <- raster::extract(raster_m,
+                              random_points,
+                              df=TRUE)
+c_results <- raster::extract(raster_c,
+                             random_points,
+                             df=TRUE)
+
+write_xlsx(m_results, "Results/test_MICRO_MIN.xlsx")
+write_xlsx(c_results, "Results/test_CHELSA_MIN.xlsx")
+
+
+
+##CHELSA OLD
+raster_co <- raster::stack()
+for (i in 1980:1989){
+  raster <- raster::stack(list.files("B:/DATA/CHELSA/SPAIN/TMAX", pattern = paste0(i), full.names = TRUE))
+  raster_co <- raster::stack(raster_co, raster)
+}
+
+raster_co <- crop(raster_co,raster_m[[1]])
+raster_co <- raster_co/10
+plot(raster_c[[1]])
+plot(raster_co[[1]])
+##Comparation
+
+
+co_results <- raster::extract(raster_co,
+                             random_points,
+                             df=TRUE)
+
+write_xlsx(co_results, "Results/test_chelsa_o.xlsx")
+
