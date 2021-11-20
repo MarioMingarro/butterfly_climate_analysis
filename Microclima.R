@@ -15,8 +15,6 @@ Transects_with_elevations <- Transects_with_elevations %>%
 transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
 transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations, by = "Name")
-rm(transect)
-rm(Transects_with_elevations)
 
 
 ## Get lat and long ----
@@ -24,6 +22,10 @@ rm(Transects_with_elevations)
 lat_long <- coordinates(spTransform(transect_centr, CRS("+proj=longlat + datum=WGS84")))
 lat_comp <- lat_long[,2]
 long_comp <- lat_long[,1]
+
+####
+lat_comp <- as.numeric(c("40.11", "40.15"))
+long_comp <- as.numeric(c("-1.02", "-1.03"))
 
 ## Get dates ----
 
@@ -44,7 +46,7 @@ f_fin <- data.frame(fecha_mal = ff) %>%
 ## Run microclima ----
 tic("Tiempo ejecucion total: ") 
 
-for (j in 1){
+for (j in 1:length(lat_comp)){
   lat <- lat_comp[j]
   long <- long_comp[j]
   mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
@@ -54,20 +56,18 @@ for (j in 1){
                     hgt = 0.1, 
                     l = NA, x = NA,
                     coastal = FALSE,
-                    habitat = 2, ######## MODIFICAR #########
+                    habitat = 7, ######## MODIFICAR #########
                     plot.progress = FALSE, save.memory = FALSE)
     tmax <- temp$tmax
     tmin <-temp$tmin
     tmed <- temp$tmean
-    writeRaster(tmax, paste0("B:/CHELSA_DATA/MICRO/tmax_",
-                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_","_H2",".tif"))), overwrite=TRUE)
-    writeRaster(tmin, paste0("B:/CHELSA_DATA/MICRO/tmin_",
-                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_","_H2",".tif"))), overwrite=TRUE)
-    writeRaster(tmed, paste0("B:/CHELSA_DATA/MICRO/tmed_",    
-                             gsub("/","_", paste0(f_inicio[i,],"_",f_fin[i,],"_","_H2",".tif"))), overwrite=TRUE)
+    writeRaster(tmax, paste0("B:/CHELSA_DATA/JAVALAMBRE/tmax_",substr(f_inicio[i,], 7,10),".tif"), overwrite=TRUE)
+    writeRaster(tmin, paste0("B:/CHELSA_DATA/JAVALAMBRE/tmin_",substr(f_inicio[i,], 7,10),".tif"), overwrite=TRUE)
+    writeRaster(tmed, paste0("B:/CHELSA_DATA/JAVALAMBRE/tmed_",substr(f_inicio[i,], 7,10),".tif"), overwrite=TRUE)
   }
 }
 toc()
+substr(f_inicio[i,], 7,10)
 #number                         descriptor
 # 1        Evergreen needleleaf forest
 # 2         Evergreen Broadleaf forest
@@ -88,7 +88,10 @@ toc()
 #17                         Open water
 
 ##--------------------------------------------------------------------------------------------------------------------------------------
-
+aa <- raster::stack(list.files("B:/CHELSA_DATA/MICRO/TMAX", pattern = "01_1980", full.names = TRUE))
+aa <- as(extent(aa), "SpatialPolygons")
+proj4string(aa) <-  CRS("+proj=longlat +datum=WGS84 +no_defs")
+shapefile(aa, "B:/CHELSA_DATA/MICRO/ext.shp")
 ##MICROCLIMA
 
 TMED_m <- raster::stack()
