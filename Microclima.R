@@ -38,12 +38,14 @@ f_inicio <- data.frame(fecha_mal = fi) %>%
   mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
   dplyr::select(fecha_bien)
 
+
 f_fin <- data.frame(fecha_mal = ff) %>% 
   separate(fecha_mal, into = c("dia", "mes", "año")) %>%
   mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
   dplyr::select(fecha_bien)
 
 ## Run microclima ----
+
 tic("Tiempo ejecucion total: ") 
 
 for (j in 1:length(lat_comp)){
