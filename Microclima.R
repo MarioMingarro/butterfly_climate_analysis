@@ -29,8 +29,8 @@ long_comp <- as.numeric(c("-1.02", "-1.03"))
 
 ## Get dates ----
 
-fi <- seq(as.Date("2009-01-01"), length=120, by="month")
-ff <- seq(as.Date("2009-02-01"), length=120, by="month")-1
+fi <- seq(as.Date("1996-01-01"), length=120, by="month")
+ff <- seq(as.Date("1996-02-01"), length=120, by="month")-1
 
 
 f_inicio <- data.frame(fecha_mal = fi) %>% 
