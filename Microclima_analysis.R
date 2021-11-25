@@ -40,20 +40,27 @@ names(test) <- names(a)
 
 ## TXM ----
 ### Monthly data to annual average ----
-TXM <- raster::stack()
+TXM_1980_1989 <- raster::stack()
+for (j in 1980:1989){ ##1980-1989, 1996-2005, 2009-2018
+  raster <- calc(raster::subset(test, grep(paste0(j), names(test), value = T)), mean)
+  TXM_1980_1989 <- raster::stack(TXM_1980_1989, raster)
+}
+names(TXM_1980_1989) <- paste0("Y_", seq(1980,1989, by = 1))
+
+TXM_1996_2005 <- raster::stack()
+for (j in 1996:2005){ ##1980-1989, 1996-2005, 2009-2018
+  raster <- calc(raster::subset(test, grep(paste0(j), names(test), value = T)), mean)
+  TXM_1996_2005 <- raster::stack(TXM_1996_2005, raster)
+}
+names(TXM_1996_2005) <- paste0("Y_", seq(1996, 2005, by = 1))
+
+TXM_2009_2018 <- raster::stack()
 for (j in 2009:2018){ ##1980-1989, 1996-2005, 2009-2018
   raster <- calc(raster::subset(test, grep(paste0(j), names(test), value = T)), mean)
-  TXM <- raster::stack(TXM, raster)
+  TXM_2009_2018 <- raster::stack(TXM_2009_2018, raster)
 }
-names(TXM) <- paste0("Y_", seq(2009,2018, by = 1))
+names(TXM_2009_2018) <- paste0("Y_", seq(2009,2018, by = 1))
 
-
-### Select data for specific periods ----
-TXM_1980_1989 <- raster::subset(TXM, grep(c("1980|1981|1982|1983|1984|1985|1986|1987|1988|1989"), names(TXM), value = T))
-
-TXM_1996_2005 <- raster::subset(TXM, grep(c("1996|1997|1998|1999|2000|2001|2002|2003|2004|2005"), names(TXM), value = T))
-
-TXM_2009_2018 <- raster::subset(TXM, grep(c("2009|2010|2011|2012|2013|2014|2015|2016|2017|2018"), names(TXM), value = T))
 
 ### Calculate mean a standard deviation for diferent periods ----
 TXM_mean_1980_1989 <- calc(TXM_1980_1989, mean)

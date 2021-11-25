@@ -189,6 +189,7 @@ for (i in 1979:2019){
 }
 names(TNMF) <- paste0("Y_", seq(1979, 2019, by = 1))
 
+
 ### Select data for specific periods ----
 TNMF_1980_1989 <- raster::subset(TNMF, grep(c("1980|1981|1982|1983|1984|1985|1986|1987|1988|1989"), names(TNMF), value = T))
 
