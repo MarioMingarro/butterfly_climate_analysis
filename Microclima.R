@@ -76,8 +76,6 @@ for (j in 1:length(lat_comp)){
 }
 toc()
 
-
-
 #number                         descriptor
 # 1        Evergreen needleleaf forest
 # 2         Evergreen Broadleaf forest
