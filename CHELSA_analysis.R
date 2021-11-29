@@ -21,6 +21,7 @@ transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations,
 ## TMED ----
 ### Monthly data to annual average ----
 TMED <- raster::stack()
+
 for (i in 1979:2019){
   raster <- calc(raster::stack(list.files("B:/CHELSA_DATA/TMED", pattern = paste0(i), full.names = TRUE)), mean) # MEAN
   TMED <- raster::stack(TMED, raster)
