@@ -24,13 +24,19 @@ lat_comp <- lat_long[,2]
 long_comp <- lat_long[,1]
 
 ####
+##Javalambre
 lat_comp <- as.numeric(c("40.11", "40.15"))
 long_comp <- as.numeric(c("-1.02", "-1.03"))
+##ALbarracin
+lat_comp <- as.numeric(c("40.40","40.27","40.41","40.32","40.46","40.50","40.32","40.42"))
+long_comp <- as.numeric(c("-1.36","-1.40","-1.61","-1.58","-1.38","-1.48","-1.70","-1.70"))
+
+
 
 ## Get dates ----
-
-fi <- seq(as.Date("1996-01-01"), length=120, by="month")
-ff <- seq(as.Date("1996-02-01"), length=120, by="month")-1
+#####1980 19996 2009
+fi <- seq(as.Date("2009-01-01"), length=120, by="month")
+ff <- seq(as.Date("2009-02-01"), length=120, by="month")-1
 
 
 f_inicio <- data.frame(fecha_mal = fi) %>% 
@@ -63,15 +69,14 @@ for (j in 1:length(lat_comp)){
     tmax <- temp$tmax
     tmin <-temp$tmin
     tmed <- temp$tmean
-    writeRaster(tmax, paste0("B:/CHELSA_DATA/JAVALAMBRE/tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
-    writeRaster(tmin, paste0("B:/CHELSA_DATA/JAVALAMBRE/tmin_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
-    writeRaster(tmed, paste0("B:/CHELSA_DATA/JAVALAMBRE/tmed_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmax, paste0("B:/CHELSA_DATA/ALBARRACIN/TMAX/tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmin, paste0("B:/CHELSA_DATA/ALBARRACIN/TMIN/tmin_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmed, paste0("B:/CHELSA_DATA/ALBARRACIN/TMED/tmed_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
   }
 }
 toc()
 
-paste0("B:/CHELSA_DATA/JAVALAMBRE/tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif")
-gsub("/","_", substr(f_inicio[i,], 5,10))
+
 #number                         descriptor
 # 1        Evergreen needleleaf forest
 # 2         Evergreen Broadleaf forest
