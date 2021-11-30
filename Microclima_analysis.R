@@ -23,16 +23,32 @@ list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern =  "_1_*.*1980", full.names
 
 
 
-a <- raster::stack(list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern = "_1_" , full.names = TRUE))
-b <- raster::stack(list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern = "_2_" , full.names = TRUE))
-names(a[[300]])
-names(b[[300]])
-mos <- mosaic(a[[1]], b[[1]], fun = mean, tolerance=0.3)
+a <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_1_" , full.names = TRUE))
+b <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_2_" , full.names = TRUE))
+c <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_3_" , full.names = TRUE))
+d <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_4_" , full.names = TRUE))
+e <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_5_" , full.names = TRUE))
+f <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_6_" , full.names = TRUE))
+g <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_7_" , full.names = TRUE))
+h <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_8_" , full.names = TRUE))
+
+
+
+
+names(h[[60]])
+names(h[[1]])
 
 
 test <- raster::stack()
 for (i in 1:nlayers(a)){
-  pp <- mosaic(a[[i]], b[[i]], fun = mean, tolerance=0.3)
+  pp <- mosaic(a[[i]],
+               b[[i]],
+               c[[i]],
+               d[[i]],
+               e[[i]],
+               f[[i]],
+               g[[i]],
+               h[[i]], fun = mean, tolerance=1)
   test <-  stack(test, pp)
 }
 names(test) <- names(a)
@@ -40,6 +56,7 @@ names(test) <- names(a)
 
 ## TXM ----
 ### Monthly data to annual average ----
+j=1980
 TXM_1980_1989 <- raster::stack()
 for (j in 1980:1989){ ##1980-1989, 1996-2005, 2009-2018
   raster <- calc(raster::subset(test, grep(paste0(j), names(test), value = T)), mean)
@@ -89,4 +106,4 @@ transect_centr_TXM$mean_2009_2018 <- raster::extract(TXM_mean_2009_2018,
 transect_centr_TXM$sd_2009_2018 <- raster::extract(TXM_sd_2009_2018,
                                                    transect_centr_TXM, buffer = NULL ,exact = TRUE)
 
-write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_results.xlsx")
+write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_albarracin_results.xlsx")
