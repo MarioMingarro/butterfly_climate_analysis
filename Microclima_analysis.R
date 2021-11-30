@@ -104,3 +104,12 @@ transect_centr_TXM$sd_2009_2018 <- raster::extract(TXM_sd_2009_2018,
                                                    transect_centr_TXM, buffer = NULL ,exact = TRUE)
 
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_albarracin_results.xlsx")
+
+ggplot(transect_centr_TXM@data, aes(x=))
+
+kk<- melt(transect_centr_TXM@data)
+nn <- na.omit(filter(kk, kk$variable == "mean_1980_1989" | kk$variable == "mean_2009_2018" ))
+
+ggplot(nn, aes(x= variable, y =value, fill=variable))+
+  geom_boxplot()+
+  theme_cleveland()
