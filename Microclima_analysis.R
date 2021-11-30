@@ -18,9 +18,8 @@ transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
 transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations, by = "Name")
 
-kk <- expand.grid(a=c("_1_"), b=seq(1980, 1989, 1))
-list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern =  "_1_*.*1980", full.names = TRUE)
 
+#list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern =  "_1_*.*1980", full.names = TRUE)
 
 
 a <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_1_" , full.names = TRUE))
@@ -31,8 +30,6 @@ e <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_5_" 
 f <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_6_" , full.names = TRUE))
 g <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_7_" , full.names = TRUE))
 h <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_8_" , full.names = TRUE))
-
-
 
 
 names(h[[60]])
