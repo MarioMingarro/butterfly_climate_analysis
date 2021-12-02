@@ -24,13 +24,25 @@ lat_comp <- lat_long[,2]
 long_comp <- lat_long[,1]
 
 ####
-##Javalambre
+
+library(readr)
+cent <- read.csv2("./cent_cuadriculas_micro.txt")
+
+## Javalambre (DONE)
 lat_comp <- as.numeric(c("40.11", "40.15"))
 long_comp <- as.numeric(c("-1.02", "-1.03"))
-##ALbarracin
-lat_comp <- as.numeric(c("40.40","40.27","40.41","40.32","40.46","40.50","40.32","40.42"))
-long_comp <- as.numeric(c("-1.36","-1.40","-1.61","-1.58","-1.38","-1.48","-1.70","-1.70"))
 
+lat_comp <- round(c(filter(cent, ZONE =="JAVALAMBRE")[,2]), 2)
+long_comp <- round(c(filter(cent, ZONE =="JAVALAMBRE")[,1]), 2)
+
+## Albarracin (DONE)
+
+lat_comp <- round(c(filter(cent, ZONE =="ALBARRACIN")[,2]), 2)
+long_comp <- round(c(filter(cent, ZONE =="ALBARRACIN")[,1]), 2)
+
+## Meridional 
+lat_comp <- round(c(filter(cent, ZONE =="MERIDIONAL")[,2]), 2)
+long_comp <- round(c(filter(cent, ZONE =="MERIDIONAL")[,1]), 2)
 
 
 ## Get dates ----
