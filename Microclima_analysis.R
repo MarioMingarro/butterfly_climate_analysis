@@ -105,7 +105,7 @@ transect_centr_TXM$sd_2009_2018 <- raster::extract(TXM_sd_2009_2018,
 
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_albarracin_results.xlsx")
 
-ggplot(transect_centr_TXM@data, aes(x=))
+
 
 kk<- melt(transect_centr_TXM@data)
 nn <- na.omit(filter(kk, kk$variable == "mean_1980_1989" | kk$variable == "mean_2009_2018" ))
