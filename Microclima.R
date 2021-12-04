@@ -25,7 +25,6 @@ long_comp <- lat_long[,1]
 
 ####
 
-library(readr)
 cent <- read.csv2("./cent_cuadriculas_micro.txt")
 
 ## Javalambre (DONE)
@@ -66,7 +65,7 @@ f_fin <- data.frame(fecha_mal = ff) %>%
 
 tic("Tiempo ejecucion total: ") 
 
-for (j in 1){
+for (j in 2:5){
   lat <- lat_comp[j]
   long <- long_comp[j]
   mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
