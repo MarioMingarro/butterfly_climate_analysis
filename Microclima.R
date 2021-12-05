@@ -65,7 +65,7 @@ f_fin <- data.frame(fecha_mal = ff) %>%
 
 tic("Tiempo ejecucion total: ") 
 
-for (j in 2:5){
+for (j in 5:7){
   lat <- lat_comp[j]
   long <- long_comp[j]
   mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
