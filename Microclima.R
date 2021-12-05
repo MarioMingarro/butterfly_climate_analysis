@@ -39,7 +39,7 @@ long_comp <- round(c(filter(cent, ZONE =="JAVALAMBRE")[,1]), 2)
 lat_comp <- round(c(filter(cent, ZONE =="ALBARRACIN")[,2]), 2)
 long_comp <- round(c(filter(cent, ZONE =="ALBARRACIN")[,1]), 2)
 
-## Meridional 
+## Meridional (1-7)
 lat_comp <- round(c(filter(cent, ZONE =="MERIDIONAL")[,2]), 2)
 long_comp <- round(c(filter(cent, ZONE =="MERIDIONAL")[,1]), 2)
 
