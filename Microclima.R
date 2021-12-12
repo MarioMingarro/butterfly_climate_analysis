@@ -43,7 +43,7 @@ long_comp <- round(c(filter(cent, ZONE =="ALBARRACIN")[,1]), 2)
 lat_comp <- round(c(filter(cent, ZONE =="MERIDIONAL")[,2]), 2)
 long_comp <- round(c(filter(cent, ZONE =="MERIDIONAL")[,1]), 2)
 
-## Guadarrama(DONE)
+## Guadarrama()
 lat_comp <- round(c(filter(cent, ZONE =="GUADARRAMA")[,2]), 2)
 long_comp <- round(c(filter(cent, ZONE =="GUADARRAMA")[,1]), 2)
 
@@ -68,7 +68,7 @@ f_fin <- data.frame(fecha_mal = ff) %>%
 
 tic("Tiempo ejecucion total: ") 
 
-for (j in 1:3){
+for (j in 4:5){
   lat <- lat_comp[j]
   long <- long_comp[j]
   mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
