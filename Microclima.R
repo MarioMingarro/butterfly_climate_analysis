@@ -49,8 +49,8 @@ long_comp <- round(c(filter(cent, ZONE =="GUADARRAMA")[,1]), 2)
 
 ## Get dates ----
 #####1980 1996 2009
-fi <- seq(as.Date("1980-01-01"), length=120, by="month")
-ff <- seq(as.Date("1980-02-01"), length=120, by="month")-1
+fi <- seq(as.Date("2009-01-01"), length=120, by="month")
+ff <- seq(as.Date("2009-02-01"), length=120, by="month")-1
 
 
 f_inicio <- data.frame(fecha_mal = fi) %>% 
@@ -68,7 +68,7 @@ f_fin <- data.frame(fecha_mal = ff) %>%
 
 tic("Tiempo ejecucion total: ") 
 
-for (j in 6:8){
+for (j in 8:10){
   lat <- lat_comp[j]
   long <- long_comp[j]
   mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
