@@ -91,7 +91,7 @@ for (j in 8:10){
 toc()
 
 
-jiji#number                         descriptor
+#number                         descriptor
 # 1        Evergreen needleleaf forest
 # 2         Evergreen Broadleaf forest
 # 3        Deciduous needleleaf forest

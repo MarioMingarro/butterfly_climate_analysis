@@ -53,7 +53,7 @@ names(test) <- names(a)
 
 ## TXM ----
 ### Monthly data to annual average ----
-j=1980
+
 TXM_1980_1989 <- raster::stack()
 for (j in 1980:1989){ ##1980-1989, 1996-2005, 2009-2018
   raster <- calc(raster::subset(test, grep(paste0(j), names(test), value = T)), mean)
