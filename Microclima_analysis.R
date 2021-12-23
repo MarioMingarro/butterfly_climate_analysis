@@ -39,21 +39,23 @@ l <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_12_
 names(h[[60]])
 names(l[[1]])
 plot(pp)
+nlayers()
+
 
 test <- raster::stack()
-for (i in 1:nlayers(e)){
-  pp <- mosaic(a[[2]],
-               b[[2]],
-               c[[2]],
-               d[[2]],
-               e[[2]],
-               f[[2]],
-               g[[2]],
-               h[[2]],
-               i[[2]],
-               j[[2]],
-               k[[2]],
-               l[[2]], fun = mean, tolerance=2)
+for (s in 1:nlayers(a)){
+  pp <- mosaic(a[[s]],
+               b[[s]],
+               c[[s]],
+               d[[s]],
+               e[[s]],
+               f[[s]],
+               g[[s]],
+               h[[s]],
+               i[[s]],
+               j[[s]],
+               k[[s]],
+               l[[s]], fun = mean, tolerance=10000)
   test <-  stack(test, pp)
 }
 names(test) <- names(a)
