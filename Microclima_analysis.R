@@ -41,7 +41,7 @@ names(l[[1]])
 plot(pp)
 
 test <- raster::stack()
-for (i in 1:nlayers(a)){
+for (i in 1:nlayers(e)){
   pp <- mosaic(a[[2]],
                b[[2]],
                c[[2]],
