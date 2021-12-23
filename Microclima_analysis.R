@@ -22,30 +22,38 @@ transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations,
 #list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern =  "_1_*.*1980", full.names = TRUE)
 
 
-a <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_1_" , full.names = TRUE))
-b <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_2_" , full.names = TRUE))
-c <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_3_" , full.names = TRUE))
-d <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_4_" , full.names = TRUE))
-e <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_5_" , full.names = TRUE))
-f <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_6_" , full.names = TRUE))
-g <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_7_" , full.names = TRUE))
-h <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "_8_" , full.names = TRUE))
+a <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_1_" , full.names = TRUE))
+b <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_2_" , full.names = TRUE))
+c <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_3_" , full.names = TRUE))
+d <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_4_" , full.names = TRUE))
+e <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_5_" , full.names = TRUE))
+f <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_6_" , full.names = TRUE))
+g <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_7_" , full.names = TRUE))
+h <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_8_" , full.names = TRUE))
+i <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_9_" , full.names = TRUE))
+j <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_10_" , full.names = TRUE))
+k <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_11_" , full.names = TRUE))
+l <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_12_" , full.names = TRUE))
 
 
 names(h[[60]])
-names(h[[1]])
-
+names(l[[1]])
+plot(pp)
 
 test <- raster::stack()
 for (i in 1:nlayers(a)){
-  pp <- mosaic(a[[i]],
-               b[[i]],
-               c[[i]],
-               d[[i]],
-               e[[i]],
-               f[[i]],
-               g[[i]],
-               h[[i]], fun = mean, tolerance=1)
+  pp <- mosaic(a[[2]],
+               b[[2]],
+               c[[2]],
+               d[[2]],
+               e[[2]],
+               f[[2]],
+               g[[2]],
+               h[[2]],
+               i[[2]],
+               j[[2]],
+               k[[2]],
+               l[[2]], fun = mean, tolerance=2)
   test <-  stack(test, pp)
 }
 names(test) <- names(a)
