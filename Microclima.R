@@ -43,18 +43,19 @@ long_comp <- round(c(filter(cent, ZONE =="ALBARRACIN")[,1]), 2)
 lat_comp <- round(c(filter(cent, ZONE =="MERIDIONAL")[,2]), 2)
 long_comp <- round(c(filter(cent, ZONE =="MERIDIONAL")[,1]), 2)
 
-## Guadarrama()
+## Guadarrama(DONE)
 lat_comp <- round(c(filter(cent, ZONE =="GUADARRAMA")[,2]), 2)
 long_comp <- round(c(filter(cent, ZONE =="GUADARRAMA")[,1]), 2)
 
+## Gredos()
+lat_comp <- round(c(filter(cent, ZONE == "GREDOS")[,2]), 2)
+long_comp <- round(c(filter(cent, ZONE =="GREDOS")[,1]), 2)
+
 ## Get dates ----
 #####1980 1996 2009
-fi <- seq(as.Date("1980-01-01"), length=120, by="month")
-ff <- seq(as.Date("1980-02-01"), length=120, by="month")-1
+fi <- seq(as.Date("2009-01-01"), length=120, by="month")
+ff <- seq(as.Date("2009-02-01"), length=120, by="month")-1
 
-
-fi <- seq(as.Date("2012-01-01"), length=84, by="month")
-ff <- seq(as.Date("2012-02-01"), length=84, by="month")-1
 
 
 f_inicio <- data.frame(fecha_mal = fi) %>% 
@@ -87,9 +88,9 @@ for (j in 10:12){
     tmax <- temp$tmax
     tmin <-temp$tmin
     tmed <- temp$tmean
-    writeRaster(tmax, paste0("B:/CHELSA_DATA/MERIDIONAL/TMAX/tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
-    writeRaster(tmin, paste0("B:/CHELSA_DATA/MERIDIONAL/TMIN/tmin_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
-    writeRaster(tmed, paste0("B:/CHELSA_DATA/MERIDIONAL/TMED/tmed_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmax, paste0("B:/CHELSA_DATA/GREDOS/TMAX/tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmin, paste0("B:/CHELSA_DATA/GREDOS/TMIN/tmin_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmed, paste0("B:/CHELSA_DATA/GREDOS/TMED/tmed_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
   }
 }
 toc()
