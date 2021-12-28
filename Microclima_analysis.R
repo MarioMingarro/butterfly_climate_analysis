@@ -40,7 +40,6 @@ source("TMM.R")
 kk<- melt(transect_centr_TXM@data)
 nn <- na.omit(filter(kk, kk$variable == "mean_1980_1989" | kk$variable == "mean_2009_2018" ))
 
-library(PupillometryR)
 javalambre <- ggplot(nn, aes(x= variable, y =value, fill=variable))+
   geom_flat_violin(aes(fill = variable),position = position_nudge(x = .1, y = 0), trim = FALSE, alpha = .5, colour = NA)+
   geom_point(aes(x = variable, y = value, colour = variable),position = position_jitter(width = .2), size = 2, shape = 20)+
