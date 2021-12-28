@@ -6,7 +6,7 @@ packages.to.use <- c("tictoc", "raster", "devtools", "VoCC","rgeos",
                      "rnaturalearth", "rnaturalearthdata", "viridis", 
                      "tidyverse","rgdal", "writexl","ggpubr", "diffeR", 
                      "readxl",  "NicheMapR", "microclima", "rgdal","sf","magrittr",
-                     "tidyverse","tmap",  "lubridate")
+                     "tidyverse","tmap",  "lubridate", "PupillometryR")
 
 packages.to.use <- unique(packages.to.use)
 
