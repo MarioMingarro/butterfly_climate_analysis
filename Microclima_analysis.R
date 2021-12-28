@@ -21,22 +21,58 @@ transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations,
 
 #list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern =  "_1_*.*1980", full.names = TRUE)
 
-
+#JAVALAMBRE
 a <- raster::stack(list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern = "x_1_" , full.names = TRUE))
 b <- raster::stack(list.files("B:/CHELSA_DATA/JAVALAMBRE/TMAX", pattern = "x_2_" , full.names = TRUE))
+#ALBARRACIN
+a <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_1_" , full.names = TRUE))
+b <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_2_" , full.names = TRUE))
 c <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_3_" , full.names = TRUE))
 d <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_4_" , full.names = TRUE))
 e <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_5_" , full.names = TRUE))
 f <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_6_" , full.names = TRUE))
 g <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_7_" , full.names = TRUE))
 h <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_8_" , full.names = TRUE))
-i <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_9_" , full.names = TRUE))
-j <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_10_" , full.names = TRUE))
-k <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_11_" , full.names = TRUE))
-l <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_12_" , full.names = TRUE))
+#MERIDIONAL
+a <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_1_" , full.names = TRUE))
+b <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_2_" , full.names = TRUE))
+c <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_3_" , full.names = TRUE))
+d <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_4_" , full.names = TRUE))
+e <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_5_" , full.names = TRUE))
+f <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_6_" , full.names = TRUE))
+g <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_7_" , full.names = TRUE))
+h <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_8_" , full.names = TRUE))
+i <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_9_" , full.names = TRUE))
+j <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_10_" , full.names = TRUE))
+k <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_11_" , full.names = TRUE))
+l <- raster::stack(list.files("B:/CHELSA_DATA/MERIDIONAL/TMAX", pattern = "x_12_" , full.names = TRUE))
+#GUADARRAMA
+a <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_1_" , full.names = TRUE))
+b <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_2_" , full.names = TRUE))
+c <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_3_" , full.names = TRUE))
+d <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_4_" , full.names = TRUE))
+e <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_5_" , full.names = TRUE))
+f <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_6_" , full.names = TRUE))
+g <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_7_" , full.names = TRUE))
+h <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_8_" , full.names = TRUE))
+i <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_9_" , full.names = TRUE))
+j <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_10_" , full.names = TRUE))
+k <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_11_" , full.names = TRUE))
+l <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_12_" , full.names = TRUE))
+#GREDOS
+a <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_1_" , full.names = TRUE))
+b <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_2_" , full.names = TRUE))
+c <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_3_" , full.names = TRUE))
+d <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_4_" , full.names = TRUE))
+e <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_5_" , full.names = TRUE))
+f <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_6_" , full.names = TRUE))
+g <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_7_" , full.names = TRUE))
+h <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_8_" , full.names = TRUE))
+i <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_9_" , full.names = TRUE))
+j <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_10_" , full.names = TRUE))
+k <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_11_" , full.names = TRUE))
+l <- raster::stack(list.files("B:/CHELSA_DATA/GREDOS/TMAX", pattern = "x_12_" , full.names = TRUE))
 
-
-names(h[[60]])
 names(l[[1]])
 plot(pp)
 nlayers()
@@ -113,13 +149,6 @@ transect_centr_TXM$sd_2009_2018 <- raster::extract(TXM_sd_2009_2018,
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_meridional_results.xlsx")
 
 
-
-kk<- melt(transect_centr_TXM@data)
-nn <- na.omit(filter(kk, kk$variable == "mean_1980_1989" | kk$variable == "mean_2009_2018" ))
-
-ggplot(nn, aes(x= variable, y =value, fill=variable))+
-  geom_boxplot()+
-  theme_cleveland()
 library(PupillometryR)
 javalambre <- ggplot(nn, aes(x= variable, y =value, fill=variable))+
   geom_flat_violin(aes(fill = variable),position = position_nudge(x = .1, y = 0), trim = FALSE, alpha = .5, colour = NA)+
