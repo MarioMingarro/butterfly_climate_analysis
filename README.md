@@ -1,3 +1,3 @@
 Butterfly climate analysis
 Repository to make analyzes reproducible
-<img src="https://github.com/MarioMingarro/MarioMingarro/blob/main/MM.gif" width="1000">
+<h1 align="center"><img src="https://media.giphy.com/media/3ohzdPGmrhcqwsKcFi/giphy.gif" width="250">
