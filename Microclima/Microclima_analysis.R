@@ -200,6 +200,7 @@ i <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_9_"
 j <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_10_" , full.names = TRUE))
 k <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_11_" , full.names = TRUE))
 l <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_12_" , full.names = TRUE))
+m <- raster::stack(list.files("B:/CHELSA_DATA/GUADARRAMA/TMAX", pattern = "x_13_" , full.names = TRUE))
 
 n.cores <- parallel::detectCores() - 1
 my.cluster <- parallel::makeCluster(
@@ -222,6 +223,7 @@ test <- foreach(s = 1:240
                                      j[[s]],
                                      k[[s]],
                                      l[[s]],
+                                     m[[s]],
                                      fun = mean, tolerance = 1000))
 } 
 parallel::stopCluster(cl = my.cluster)

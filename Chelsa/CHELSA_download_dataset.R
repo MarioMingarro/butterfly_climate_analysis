@@ -18,7 +18,7 @@ source("Dependencies/Functions.R")
 ## Mean temperature ----
 
 # Load .txt with the entire directory which download
-CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths_tmed.txt")
+CHELSA_dwld_paths <- readLines("Data/CHELSA_dwld_paths_tmed.txt")
 
 # Load and reproject iberian peninsula mask
 mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
@@ -60,7 +60,7 @@ file.rename(paste0("B:/CHELSA_DATA/TMED/",list.files("B:/CHELSA_DATA/TMED")),
 ## Monthly precipitation ----
 
 # Same steps as mean temperature (above)
-CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths_pcp.txt")
+CHELSA_dwld_paths <- readLines("Data/CHELSA_dwld_paths_pcp.txt")
 
 data_rep <- "B:/CHELSA_DATA/PCP/" 
 
@@ -95,7 +95,7 @@ file.rename(paste0("B:/CHELSA_DATA/PCP/",list.files("B:/CHELSA_DATA/PCP")),
 ## Maximum temperature ----
 
 # Load .txt with the entire directory which download
-CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths_tmax.txt")
+CHELSA_dwld_paths <- readLines("Data/CHELSA_dwld_paths_tmax.txt")
 
 # Load and reproject iberian peninsula mask
 mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
@@ -137,7 +137,7 @@ file.rename(paste0("B:/CHELSA_DATA/TMAX/",list.files("B:/CHELSA_DATA/TMAX")),
 ## Minimum temperature ----
 
 # Load .txt with the entire directory which download
-CHELSA_dwld_paths <- readLines("CHELSA_dwld_paths_tmin.txt")
+CHELSA_dwld_paths <- readLines("Data/CHELSA_dwld_paths_tmin.txt")
 
 # Load and reproject iberian peninsula mask
 mask <- shapefile("Data/Peninsula_Iberica_mask.shp")
