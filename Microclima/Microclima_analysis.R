@@ -81,7 +81,8 @@ my.cluster <- parallel::makeCluster(
   type = "PSOCK"
 )
 doParallel::registerDoParallel(cl = my.cluster)
-test <- foreach(s = 1:240
+test <- raster::stack()
+test <- foreach(s = 1:360
 ) %dopar% {
   raster::stack(test, raster::mosaic(a[[s]],
                                      b[[s]],
@@ -91,7 +92,7 @@ test <- foreach(s = 1:240
                                      f[[s]],
                                      g[[s]],
                                      h[[s]],
-                                     fun = mean, tolerance = 1))
+                                     fun = mean, tolerance = 1000))
 } 
 parallel::stopCluster(cl = my.cluster)
 test <- stack(unlist(test))
@@ -143,7 +144,7 @@ my.cluster <- parallel::makeCluster(
 )
 doParallel::registerDoParallel(cl = my.cluster)
 test <- raster::stack()
-test <- foreach(s = 1:240
+test <- foreach(s = 1:360
 ) %dopar% {
   raster::stack(test, raster::mosaic(a[[s]],
                                      b[[s]],
@@ -209,7 +210,7 @@ my.cluster <- parallel::makeCluster(
 )
 doParallel::registerDoParallel(cl = my.cluster)
 test <- raster::stack()
-test <- foreach(s = 1:240
+test <- foreach(s = 1:360
 ) %dopar% {
   raster::stack(test, raster::mosaic(a[[s]],
                                      b[[s]],
