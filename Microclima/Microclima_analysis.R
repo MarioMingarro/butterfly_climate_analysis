@@ -43,11 +43,11 @@ parallel::stopCluster(cl = my.cluster)
 test <- stack(unlist(test))
 names(test) <- names(a)
 
-source("TMM.R")
+source("Microclima/TMM.R")
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_javalambre_results.xlsx")
 
 kk<- melt(transect_centr_TXM@data)
-javalambre_d <- na.omit(filter(kk, kk$variable == "mean_1980_1989" | kk$variable == "mean_2009_2018" ))
+javalambre_d <- na.omit(filter(kk, kk$variable == "mean_1980_1989" | kk$variable == "mean_1996_2005" | kk$variable == "mean_2009_2018" ))
 
 javalambre <- ggplot(javalambre_d, aes(x= variable, y =value, fill=variable))+
   geom_flat_violin(aes(fill = variable),position = position_nudge(x = .1, y = 0), trim = FALSE, alpha = .5, colour = NA)+
