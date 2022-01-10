@@ -277,7 +277,7 @@ my.cluster <- parallel::makeCluster(
 )
 doParallel::registerDoParallel(cl = my.cluster)
 test <- raster::stack()
-test <- foreach(s = 1:240
+test <- foreach(s = 1:360
 ) %dopar% {
   raster::stack(test, raster::mosaic(a[[s]],
                                      b[[s]],
