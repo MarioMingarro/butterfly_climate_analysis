@@ -270,7 +270,7 @@ transect_centr_TXM$mean_2009_2018 <- raster::extract(TXM_mean_2009_2018,
 transect_centr_TXM$sd_2009_2018 <- raster::extract(TXM_sd_2009_2018,
                                                     transect_centr_TXM, buffer = NULL ,exact = TRUE)
 
-write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_CHELSA_results.xlsx")
+write_xlsx(transect_centr_TXM@data, "Results/Excel/Mean_Max_temp_transects_CHELSA_results2.xlsx")
 # Some fast plots ----
 
 ## TMED ----
