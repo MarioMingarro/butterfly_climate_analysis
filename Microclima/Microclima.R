@@ -53,8 +53,8 @@ long_comp <- round(c(filter(cent, ZONE =="GREDOS")[,1]), 2)
 
 ## Get dates ----
 #####1980 1996 2009
-fi <- seq(as.Date("2009-01-01"), length=120, by="month")
-ff <- seq(as.Date("2009-02-01"), length=120, by="month")-1
+fi <- seq(as.Date("1980-01-01"), length=120, by="month")
+ff <- seq(as.Date("1980-02-01"), length=120, by="month")-1
 
 f_inicio <- data.frame(fecha_mal = fi) %>% 
   separate(fecha_mal, into = c("dia", "mes", "año")) %>%
@@ -71,7 +71,7 @@ f_fin <- data.frame(fecha_mal = ff) %>%
 
 tic("Tiempo ejecucion total: ") 
 
-for (j in 10:12){
+for (j in 13){
   lat <- lat_comp[j]
   long <- long_comp[j]
   mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
@@ -86,9 +86,9 @@ for (j in 10:12){
     tmax <- temp$tmax
     tmin <-temp$tmin
     tmed <- temp$tmean
-    writeRaster(tmax, paste0("B:/CHELSA_DATA/GREDOS/TMAX/tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
-    writeRaster(tmin, paste0("B:/CHELSA_DATA/GREDOS/TMIN/tmin_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
-    writeRaster(tmed, paste0("B:/CHELSA_DATA/GREDOS/TMED/tmed_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmax, paste0("B:/CHELSA_DATA/GUADARRAMA/TMAX/tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmin, paste0("B:/CHELSA_DATA/GUADARRAMA/TMIN/tmin_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmed, paste0("B:/CHELSA_DATA/GUADARRAMA/TMED/tmed_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
   }
 }
 toc()
