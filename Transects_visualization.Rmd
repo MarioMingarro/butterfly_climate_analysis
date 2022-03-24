@@ -1,0 +1,272 @@
+---
+title: "Transects"
+author: "Mario"
+date: "25/1/2022"
+output: html_document
+---
+# Transectos y estaciones AEMET
+```{r Mapa interactivo 2, warning = FALSE, message = FALSE, comment = NA, echo = FALSE}
+library(leaflet)
+library(rgdal)
+library(raster)
+
+transect <- readOGR("Data/TRANSECTS_2021_v2.kml")
+Aemet_stations <- readOGR("Data/AEMET_stations.shp")
+stations <- cbind(Aemet_stations@data, 
+                  long = coordinates(Aemet_stations)[,1],
+                  lat = coordinates(Aemet_stations)[,2])
+
+#slope <- raster("B:/MARIPOSAS/TRANSECTOS/VARIABLES/MDT/5m/slope.tif")
+#slope = projectRaster(slope, crs = proj4string(transect))
+
+
+m <- leaflet(width = "100%") %>% 
+  setView(lng = -3.689, 
+          lat = 40.440, 
+          zoom = 8) %>%
+  addCircleMarkers(data= stations, 
+             ~long, 
+             ~lat,
+             popup = paste0("ID: ", stations$indicativo, 
+                             "<br>",
+                            "Nombre: ", stations$nombre),
+             label = paste0("ID: ", stations$indicativo, 
+                             "<br>",
+                            "Nombre: ", stations$nombre)) %>% 
+  addPolylines(data= transect, opacity = 1,
+              color = "red", 
+              highlight = highlightOptions(color='white',
+                                           weight=1,
+                                           bringToFront = TRUE),
+              popup = paste0("Name: ",transect$Name),
+              label = paste0("Name: ",transect$Name),
+    labelOptions = labelOptions( 
+      style = list("font-weight" = "normal", padding = "3px 8px"), 
+      textsize = "13px", 
+      direction = "auto"
+    )) %>% 
+  #addRasterImage(slope, opacity = 0.5) %>%
+  #addLegend(title = "slope %") %>% 
+  addTiles() %>% 
+  addProviderTiles("Esri.WorldImagery")
+
+m 
+```
+```{r,warning = FALSE, message = FALSE, comment = NA, echo = FALSE}
+library(climaemet)
+library(reshape2)
+library(PupillometryR)
+library(ggpubr)
+
+API <- "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJpb19taW5nYXJyb0Bob3RtYWlsLmNvbSIsImp0aSI6IjUyNDAzNzBiLTU4ZWUtNDJmZC1iM2MxLTZjOGJiZDkxN2MyMyIsImlzcyI6IkFFTUVUIiwiaWF0IjoxNTYwNDM5OTU4LCJ1c2VySWQiOiI1MjQwMzcwYi01OGVlLTQyZmQtYjNjMS02YzhiYmQ5MTdjMjMiLCJyb2xlIjoiIn0.AjAxutpJ7B5IdKrHluzX0mMp8VKpbIMIPOUsdzsrRTc"
+
+
+
+station <- "2462" 
+
+navacerrada_data <- tibble(monht = c(seq(1, 12, 1)))           # Create an empty data frame to store the data we are interested in.
+for (y in c(1980, 2018)){                                      # Loop to select different years to see temperature differences
+  data <- aemet_monthly_clim(station, year = y)                # Use the climemet function to download the data.
+  data <- select(data, tm_max)                                 # Select the variable of interest. Monthly average of maximum temperatures
+  names(data) <- paste0("Y_",y)                                # Rename variables to call them Y_1960 and Y_2020
+  navacerrada_data <- cbind(navacerrada_data, data[c(1:12),])  # Join the downloaded data with the previously generated dataframe by columns.
+}
+
+navacerrada_data <- melt(navacerrada_data[,c(2,3)])            # Change the structure of the data in order to be able to graph it.
+
+station <- "8096"
+
+cuenca_monthly <- tibble(monht = c(seq(1, 12, 1)))
+for (y in c(1980, 2018)){
+  data <- aemet_monthly_clim(station, year = y)
+  data <- select(data, tm_max)
+  names(data) <- paste0("Y_",y)
+  cuenca_monthly <- cbind(cuenca_monthly, data[c(1:12),])
+}
+
+
+cuenca_data <- melt(cuenca_monthly[,c(2,3)])
+
+station <- "3013"
+
+molina_aragon_monthly <- tibble(monht = c(seq(1, 12, 1)))
+for (y in c(1980, 2018)){
+  data <- aemet_monthly_clim(station, year = y)
+  data <- select(data, tm_max)
+  names(data) <- paste0("Y_",y)
+  molina_aragon_monthly <- cbind(molina_aragon_monthly, data[c(1:12),])
+}
+
+
+molina_aragon_data <- melt(molina_aragon_monthly[,c(2,3)])
+
+station <- "3391"
+
+sotillo_monthly <- tibble(monht = c(seq(1, 12, 1)))
+for (y in c(1980, 2018)){
+  data <- aemet_monthly_clim(station, year = y)
+  data <- select(data, tm_max)
+  names(data) <- paste0("Y_",y)
+  sotillo_monthly <- cbind(sotillo_monthly, data[c(1:12),])
+}
+
+
+sotillo_data <- melt(sotillo_monthly[,c(2,3)])
+
+#Plot----
+
+navacerrada <- ggplot(navacerrada_data,
+                      aes(
+                        x = variable,
+                        y = value,
+                        fill = variable,
+                        colour = variable
+                      )) +
+  geom_flat_violin(
+    position = position_nudge(x = .1, y = 0),
+    trim = FALSE,
+    alpha = 0.5,
+    colour = NA
+  ) +
+  geom_point(position = position_jitter(width = .2),
+             size = 2,
+             shape = 20) +
+  geom_boxplot(
+    outlier.shape = NA,
+    alpha = .5,
+    width = .1,
+    colour = "black"
+  ) +
+  scale_y_continuous("ºC",c(-10,-5,0,5,10,15,20,25,30,35,40), limits = c(-10,40))+
+  scale_colour_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2") +
+  ggtitle("Navacerrada") +
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+
+
+cuenca <-
+  ggplot(cuenca_data,
+         aes(
+           x = variable,
+           y = value,
+           fill = variable,
+           colour = variable
+         )) +
+  geom_flat_violin(
+    position = position_nudge(x = .1, y = 0),
+    trim = FALSE,
+    alpha = 0.5,
+    colour = NA
+  ) +
+  geom_point(position = position_jitter(width = .2),
+             size = 2,
+             shape = 20) +
+  geom_boxplot(
+    outlier.shape = NA,
+    alpha = .5,
+    width = .1,
+    colour = "black"
+  ) +
+  scale_y_continuous("ºC",c(-10,-5,0,5,10,15,20,25,30,35,40), limits = c(-10,40))+
+  scale_colour_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2") +
+  ggtitle("Cuenca") +
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+molina_aragon <-
+  ggplot(molina_aragon_data,
+         aes(
+           x = variable,
+           y = value,
+           fill = variable,
+           colour = variable
+         )) +
+  geom_flat_violin(
+    position = position_nudge(x = .1, y = 0),
+    trim = FALSE,
+    alpha = 0.5,
+    colour = NA
+  ) +
+  geom_point(position = position_jitter(width = .2),
+             size = 2,
+             shape = 20) +
+  geom_boxplot(
+    outlier.shape = NA,
+    alpha = .5,
+    width = .1,
+    colour = "black"
+  ) +
+  scale_y_continuous("ºC",c(-10,-5,0,5,10,15,20,25,30,35,40), limits = c(-10,40))+
+  scale_colour_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2") +
+  ggtitle("molina_aragon") +
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+sotillo <-
+  ggplot(sotillo_data,
+         aes(
+           x = variable,
+           y = value,
+           fill = variable,
+           colour = variable
+         )) +
+  geom_flat_violin(
+    position = position_nudge(x = .1, y = 0),
+    trim = FALSE,
+    alpha = 0.5,
+    colour = NA
+  ) +
+  geom_point(position = position_jitter(width = .2),
+             size = 2,
+             shape = 20) +
+  geom_boxplot(
+    outlier.shape = NA,
+    alpha = .5,
+    width = .1,
+    colour = "black"
+  ) +
+  scale_y_continuous("ºC",c(-10,-5,0,5,10,15,20,25,30,35,40), limits = c(-10,40))+
+  scale_colour_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2") +
+  ggtitle("sotillo") +
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+
+ggarrange(navacerrada, cuenca, molina_aragon, sotillo, common.legend = TRUE, legend = "bottom",
+          ncol = 2, nrow = 2)
+library(plotly)
+ggplotly(navacerrada)
+ggplotly(cuenca)
+ggplotly(molina_aragon)
+ggplotly(sotillo)
+```
+
+
