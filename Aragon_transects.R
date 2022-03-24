@@ -23,7 +23,7 @@ Aragon <- as_Spatial(esp_get_ccaa(epsg = "4326",
 
 ### Same RS
 proj4string(transect_centr)
-proj4string(Aragon)
+proj4string(Aragon) 
 
 test <- crop(transect_centr, Aragon)
 plot(test)
