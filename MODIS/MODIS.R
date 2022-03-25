@@ -4,12 +4,13 @@ rm(list=(ls()[ls()!="TMED"]))
 gc(reset=TRUE)
 source("Dependencies/Functions.R")
 
+# Download MODIS data
 library(remotes)
 install_github("ropensci/MODIStsp")
 library(MODIStsp)
 MODIStsp()
 
-library(raster)
+
 TMED <- raster::stack()
 
 for (i in 2000:2018){
@@ -34,3 +35,12 @@ Transects_with_elevations <- Transects_with_elevations %>%
 transect_centr <- gCentroid(transect, byid = TRUE)
 transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
 transect_centr@data <- left_join(transect_centr@data, Transects_with_elevations, by = "Name")
+
+transect_centr_TMED <- transect_centr
+
+
+
+transect_centr_TMED$Description <- raster::extract(TMED,
+                                                     transect_centr_TMED, buffer = NULL ,exact = TRUE)
+
+view(transect_centr_TMED$Description)
