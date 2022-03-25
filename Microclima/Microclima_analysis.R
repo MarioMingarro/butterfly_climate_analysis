@@ -43,7 +43,13 @@ parallel::stopCluster(cl = my.cluster)
 test <- stack(unlist(test))
 names(test) <- names(a)
 
+for(i in 1:length(names(test))) {
+  single_band <- raster(test, layer = i)
+  writeRaster(single_band, paste0("B:/CHELSA_DATA/JAVALAMBRE/TMAX/RASTER/", names(test[[i]]),".tif"))
+}
+
 source("Microclima/TMM.R")
+
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_javalambre_results.xlsx")
 
 kk<- melt(transect_centr_TXM@data)
@@ -64,6 +70,10 @@ javalambre <- ggplot(javalambre_d, aes(x= variable, y =value, fill=variable))+
     axis.title.y = element_blank(),
     axis.ticks.x = element_blank()
   )
+
+#### 2000_2018-----
+TMAX_2000_2018 <- raster::subset(test, grep(c("2000|2001|2002|2003|2004|2005|2006|2007|2008|2009|2010|2011|2012|2013|2014|2015|2016|2017|2018"),
+                                            names(test), value = T))
 
 #ALBARRACIN-----------
 a <- raster::stack(list.files("B:/CHELSA_DATA/ALBARRACIN/TMAX", pattern = "x_1_" , full.names = TRUE))
@@ -98,6 +108,10 @@ parallel::stopCluster(cl = my.cluster)
 test <- stack(unlist(test))
   
 names(test) <- names(a)
+for(i in 1:length(names(test))) {
+  single_band <- raster(test, layer = i)
+  writeRaster(single_band, paste0("B:/CHELSA_DATA/ALBARRACIN/TMAX/RASTER/", names(test[[i]]),".tif"))
+}
 
 source("TMM.R")
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_albarracin_results.xlsx")
@@ -165,6 +179,11 @@ test <- stack(unlist(test))
 
 names(test) <- names(a)
 
+for(i in 1:length(names(test))) {
+  single_band <- raster(test, layer = i)
+  writeRaster(single_band, paste0("B:/CHELSA_DATA/MERIDIONAL/TMAX/RASTER/", names(test[[i]]),".tif"))
+}
+
 source("Microclima/TMM.R")
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_meridional_results.xlsx")
 
@@ -231,6 +250,10 @@ parallel::stopCluster(cl = my.cluster)
 test <- stack(unlist(test))
 
 names(test) <- names(a)
+for(i in 1:length(names(test))) {
+  single_band <- raster(test, layer = i)
+  writeRaster(single_band, paste0("B:/CHELSA_DATA/GUADARRAMA/TMAX/RASTER/", names(test[[i]]),".tif"))
+}
 
 source("TMM.R")
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_guadarrama_results.xlsx")
@@ -296,6 +319,11 @@ test <- foreach(s = 1:360
 parallel::stopCluster(cl = my.cluster)
 test <- stack(unlist(test))
 names(test) <- names(a)
+
+for(i in 1:length(names(test))) {
+  single_band <- raster(test, layer = i)
+  writeRaster(single_band, paste0("B:/CHELSA_DATA/GREDOS/TMAX/RASTER/", names(test[[i]]),".tif"))
+}
 
 source("TMM.R")
 write_xlsx(transect_centr_TXM@data, "Results/Mean_Max_temp_transects_gredos_results.xlsx")
