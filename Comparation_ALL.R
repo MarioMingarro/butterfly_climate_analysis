@@ -357,7 +357,7 @@ ALL_DATA_MELTED <- left_join(ALL_DATA_MELTED, as.data.frame(Transects_with_eleva
 ALL_DATA_MELTED$variable <- as.numeric(gsub("Y_","",as.character(ALL_DATA_MELTED$variable)))
 ALL_DATA_MELTED <- dplyr::rename(ALL_DATA_MELTED, YEAR=variable)
 
-# All tmax vs year with trends 
+## All tmax vs year with trends ----
 ggplot(ALL_DATA_MELTED, aes(x=YEAR, y=value))+
   geom_point(aes(col= MODEL), alpha = 0.2)+
   geom_smooth(aes(group = MODEL),method = lm, se = FALSE,color="black")+
@@ -368,7 +368,7 @@ ggplot(ALL_DATA_MELTED, aes(x=YEAR, y=value))+
     axis.title.y = element_blank(),
     axis.ticks.x = element_blank()
   )
-# All tmax vs elevation with trends 
+## All tmax vs elevation with trends -----------
 ggplot(ALL_DATA_MELTED, aes(x=Alt, y=value))+
   geom_point(aes(col= MODEL), alpha = 0.2)+
   geom_smooth(aes(group = MODEL),method = lm, se = FALSE,color="black")+
@@ -379,7 +379,56 @@ ggplot(ALL_DATA_MELTED, aes(x=Alt, y=value))+
     axis.title.y = element_blank(),
     axis.ticks.x = element_blank()
   )
+## 2000-2018 PERIODS AND ZONES -----
+filt <- filter(ALL_DATA_MELTED, MODEL == "TERRACLIMATE")
+filt_00_04 <- filter(filt, YEAR == 2000:2004)
+filt_00_04 <- ggplot(filt_00_04,aes(x=Alt, y=value))+
+  geom_point(aes(col= ZONA), alpha = 0.2)+
+  geom_smooth(aes(group = ZONA, col=ZONA, fill =ZONA),method = lm, se = FALSE,)+
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = "none"
+  )
 
+
+filt_05_12 <- filter(filt, YEAR== 2005:2012)
+filt_05_12 <- ggplot(filt_05_12, aes(x = Alt, y = value)) +
+  geom_point(aes(col = ZONA), alpha = 0.2) +
+  geom_smooth(aes(group = ZONA, col = ZONA, fill = ZONA),
+              method = lm,
+              se = FALSE) +
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = "none"
+  )
+filt_13_18 <- filter(filt, YEAR== 2013:2018)
+legend <- get_legend(ggplot(filt_13_18, aes(x = Alt, y = value)) +
+                       geom_smooth(aes(group = ZONA, col = ZONA, fill = ZONA)))
+filt_13_18 <- ggplot(filt_13_18, aes(x = Alt, y = value)) +
+  geom_point(aes(col = ZONA), alpha = 0.2) +
+  geom_smooth(aes(group = ZONA, col = ZONA, fill = ZONA),
+              method = lm,
+              se = FALSE) +
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    legend.position = "none")
+
+plot <- ggarrange(filt_00_04,filt_05_12,filt_13_18,legend,
+          labels = c("2000-2004", "2005-2012", "2013-2018"),font.label = list(size = 10, color = "black", face = "bold", family = NULL),
+          ncol = 2, nrow = 2)
+annotate_figure(plot, top = text_grob("TERRACLIMATE", 
+                                      color = "black",  size = 10))
+
+## Individual model plot 
 filt <- filter(ALL_DATA_MELTED, MODEL == "MODIS")
 ggplot(filt,aes(x=Alt, y=value))+
   geom_point(aes(col= ZONA), alpha = 0.2)+
@@ -391,6 +440,7 @@ ggplot(filt,aes(x=Alt, y=value))+
     axis.title.y = element_blank(),
     axis.ticks.x = element_blank()
   )
+
 
 filt <- filter(ALL_DATA_MELTED, MODEL == "STEAD")
 ggplot(filt,aes(x=Alt, y=value))+
@@ -462,53 +512,6 @@ ALL_DATA[1,75:length(ALL_DATA)] <- rep("TERRACLIMATE", length(TERRACLIMATE_data)
 
 
 write.csv(ALL_DATA,"C:/GITHUB_REP/butterfly_climate_analysis/Results/All_2000_2018.csv" )
-
-
-kk <- read_excel("Results/All_2000_2018.xls", 
-                 col_names = FALSE)
-
-kk <- melt(kk)
-
-
-pp <- select(kk,contains("TERRACLIMATE"))
-
-
-
-
-chelsa_2000_2018 <- raster::extract(TMED,
-                                    transect_centr_TMED, buffer = NULL ,exact = TRUE)
-chelsa_2000_2018 <- as.data.frame(chelsa_2000_2018)
-chelsa_2000_2018$NAME <- transect_centr@data$Name_new
-chelsa_2000_2018$ZONA <- transect_centr@data$ZONE
-
-bb <- melt(chelsa_2000_2018)
-ggplot(bb, aes(variable, value, group=ZONA, color=ZONA))+
-  geom_point(alpha =0.2)+
-  geom_smooth(aes(fill=ZONA))+
-  scale_colour_brewer(palette = "Dark2") +
-  scale_fill_brewer(palette = "Dark2")+
-  scale_x_discrete(labels = seq(2000, 2018, 1))+
-  theme(
-    legend.title = element_blank(),
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    axis.ticks.x = element_blank(),
-    axis.text.x = element_text(size = 6)
-  )
-
-
-
-kk <- brick(stack((list.files("B:/DATA/MODIS/Surf_Temp_8Days_1Km_v61/LST_Day_1km", pattern = paste0(2000), full.names = TRUE))))
-plot(kk$MOD11A2_LST_Day_1km_2000_049)
-kk$MOD11A2_LST_Day_1km_2000_049@data
-
-
-
-
-
-
-
-# ---------------------
 
 
 
