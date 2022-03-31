@@ -37,6 +37,7 @@ MODIS_data <- as.data.frame(MODIS_data)
 MODIS_data$NAME <- transect_centr_MODIS@data$Name_new
 MODIS_data$ZONA <- transect_centr_MODIS@data$ZONE
 
+
 aa <- melt(MODIS_data)
 MODIS_plot <- ggplot(aa, aes(variable, value, group=aa$ZONA, color=aa$ZONA))+
   geom_point(alpha =0.2)+
@@ -329,8 +330,117 @@ TERRACLIMATE_plot <-
     axis.text.x = element_text(size = 6)
   )
 
+###########
+#ALL --------
+MODIS_2 <- melt(MODIS_data)
+MODEL <- rep("MODIS",nrow(MODIS_2))
+MODIS_2 <- cbind(MODIS_2, MODEL)
+
+CHELSA_2 <- melt(CHELSA_data)
+MODEL <- rep("CHELSA",nrow(CHELSA_2))
+CHELSA_2 <- cbind(CHELSA_2, MODEL)
+
+STEAD_2 <- melt(STEAD_data)
+MODEL <- rep("STEAD",nrow(STEAD_2))
+STEAD_2 <- cbind(STEAD_2, MODEL)
+
+MICROCLIMA_2 <- melt(MICROCLIMA_data)
+MODEL <- rep("MICROCLIMA",nrow(MICROCLIMA_2))
+MICROCLIMA_2 <- cbind(MICROCLIMA_2, MODEL)
+
+TERRACLIMATE_2 <- melt(TERRACLIMATE_data)
+MODEL <- rep("TERRACLIMATE",nrow(TERRACLIMATE_2))
+TERRACLIMATE_2 <- cbind(TERRACLIMATE_2, MODEL)
+
+ALL_DATA_MELTED <- bind_rows(MODIS_2,CHELSA_2,STEAD_2,MICROCLIMA_2,TERRACLIMATE_2)
+ALL_DATA_MELTED <- left_join(ALL_DATA_MELTED, as.data.frame(Transects_with_elevations), by = c("NAME"="Name_new"))
+ALL_DATA_MELTED$variable <- as.numeric(gsub("Y_","",as.character(ALL_DATA_MELTED$variable)))
+ALL_DATA_MELTED <- dplyr::rename(ALL_DATA_MELTED, YEAR=variable)
+
+# All tmax vs year with trends 
+ggplot(ALL_DATA_MELTED, aes(x=YEAR, y=value))+
+  geom_point(aes(col= MODEL), alpha = 0.2)+
+  geom_smooth(aes(group = MODEL),method = lm, se = FALSE,color="black")+
+  geom_smooth(aes(group = MODEL, col=MODEL, fill =MODEL))+
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+# All tmax vs elevation with trends 
+ggplot(ALL_DATA_MELTED, aes(x=Alt, y=value))+
+  geom_point(aes(col= MODEL), alpha = 0.2)+
+  geom_smooth(aes(group = MODEL),method = lm, se = FALSE,color="black")+
+  geom_smooth(aes(group = MODEL, col=MODEL, fill =MODEL))+
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+
+filt <- filter(ALL_DATA_MELTED, MODEL == "MODIS")
+ggplot(filt,aes(x=Alt, y=value))+
+  geom_point(aes(col= ZONA), alpha = 0.2)+
+  geom_smooth(aes(group = ZONA, col=ZONA, fill =ZONA),method = lm, se = FALSE,)+
+  ggtitle("MODIS")+
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+
+filt <- filter(ALL_DATA_MELTED, MODEL == "STEAD")
+ggplot(filt,aes(x=Alt, y=value))+
+  geom_point(aes(col= ZONA), alpha = 0.2)+
+  geom_smooth(aes(group = ZONA, col=ZONA, fill =ZONA),method = lm, se = FALSE,)+
+  ggtitle("STEAD")+
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+
+filt <- filter(ALL_DATA_MELTED, MODEL == "TERRACLIMATE")
+ggplot(filt,aes(x=Alt, y=value))+
+  geom_point(aes(col= ZONA), alpha = 0.2)+
+  geom_smooth(aes(group = ZONA, col=ZONA, fill =ZONA),method = lm, se = FALSE,)+
+  ggtitle("TERRACLIMATE")+
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+
+filt <- filter(ALL_DATA_MELTED, MODEL == "CHELSA")
+ggplot(filt,aes(x=Alt, y=value))+
+  geom_point(aes(col= ZONA), alpha = 0.2)+
+  geom_smooth(aes(group = ZONA, col=ZONA, fill =ZONA),method = lm, se = FALSE,)+
+  ggtitle("CHELSA")+
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+filt <- filter(ALL_DATA_MELTED, MODEL == "MICROCLIMA")
+ggplot(filt,aes(x=Alt, y=value))+
+  geom_point(aes(col= ZONA), alpha = 0.2)+
+  geom_smooth(aes(group = ZONA, col=ZONA, fill =ZONA),method = lm, se = FALSE,)+
+  ggtitle("MICROCLIMA")+
+  theme(
+    legend.title = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank()
+  )
 
 #####
+## To excel----
 MICROCLIMA_data <- rbind(rep("MICROCLIMA", length(MICROCLIMA_data)),MICROCLIMA_data)
 MODIS_data <- rbind(rep("MODIS", length(MODIS_data)),MODIS_data)
 STEAD_data <- rbind(rep("STEAD", length(STEAD_data)),STEAD_data)
