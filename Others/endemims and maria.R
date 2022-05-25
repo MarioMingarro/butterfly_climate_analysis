@@ -11,7 +11,26 @@ spp <- tolower(spp)
 endemism <- na.omit(subset(BD_Mariposas,BD_Mariposas$`ESPECIE 2017` %in% spp))
 write.csv(endemism, "B:/MARIPOSAS/ENDEMISM/endemism.csv")
 
+# TMED
+
+for (i in 1901:2016){
+  TMED <- raster::stack()
+  TMAX <- raster::stack(list.files("B:/DATA/CHELSA/SPAIN/TMAX", pattern = paste0(i), full.names = TRUE))
+  TMIN <- raster::stack(list.files("B:/DATA/CHELSA/SPAIN/TMIN", pattern = paste0(i), full.names = TRUE))
+  TMED <- stack(TMED,(TMAX+TMIN)/20)
+  names(TMED) <-
+    paste0("Y_", format(seq.Date(
+      as.Date(paste0(i, "-1-1")), as.Date(paste0(i, "-12-31")), by = "month"),
+      format = "%m_%Y"))
+  for(j in 1:12){
+    single_band <- raster(TMED, layer = j)
+    writeRaster(single_band, paste0("B:/DATA/CHELSA/SPAIN/TMED/", names(TMED[[j]]), ".tif"))
+  }
+  
+}
+
 ##### MARIA
+
 
 mariposas <-  read_excel("A:/MARIA/Lepidoptera_revised_AdrianMay_43sp_junto 18-5_with_julian_dates.xlsx", 
                               col_types = c("numeric", "text", "text", 
