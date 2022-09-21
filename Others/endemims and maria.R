@@ -5,11 +5,15 @@ library(sf)
 BD_Mariposas <- read_excel("B:/MARIPOSAS/115_UTM/ATLAS/BD_Mariposas.xlsx")
 
 spp <- c("A. pyrenaicus","A. zullichi","A. morronensis","E. hispania","E. palarica","E. rondoui","E. zapateri","E. bazae",
-         "A. hesperica","L. bleusei","L. caelestissima","P. fassei","P. fulgens","P. golgus","P. nivescens","P. violetae","P. panoptes")
+         "A. hesperica","L. bleusei","L. caelestissima","P. fabressei","P. fulgens","P. golgus","P. nivescens","P. violetae","P. panoptes")
 spp <- tolower(spp)
 
 endemism <- na.omit(subset(BD_Mariposas,BD_Mariposas$`ESPECIE 2017` %in% spp))
-write.csv(endemism, "B:/MARIPOSAS/ENDEMISM/endemism.csv")
+write.csv(endemism, "B:/MARIPOSAS/ENDEMISM/endemism2.csv")
+
+endemism %>% 
+  group_by(UTM = CUMT, Spp = `ESPECIE 2017`) %>% 
+  summary
 
 # TMED
 
