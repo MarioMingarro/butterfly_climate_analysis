@@ -1,0 +1,121 @@
+---
+title: "Untitled"
+author: "Mario"
+date: "13/12/2022"
+output: html_document
+---
+
+```{r}
+# Clean and load packages ----
+
+packages.to.use <- c("tictoc", "raster", "devtools", "VoCC","rgeos",
+                     "rasterVis","gridExtra","doParallel","foreach",
+                     "scales","data.table","mapplots","repmis","sf",
+                     "rnaturalearth", "rnaturalearthdata", "viridis", 
+                     "tidyverse","rgdal", "writexl","ggpubr", "diffeR", 
+                     "readxl",  "NicheMapR", "microclima", "rgdal","sf","magrittr",
+                     "tidyverse","tmap",  "lubridate", "PupillometryR")
+
+packages.to.use <- unique(packages.to.use)
+
+for(package in packages.to.use) {
+  print(package)
+  if( ! package %in% rownames(installed.packages()) ) { install.packages(package ) }
+  if( ! package %in% rownames(installed.packages()) ) { stop("Error on package instalation") }
+  suppressWarnings( library(package, character.only = TRUE) )
+}
+
+# Transects------
+
+
+data <- readOGR("B:/MARIPOSAS/TRANSECTOS_MICROCLIMA/transectos_89N.shp")
+
+# meadow <- c("6Tor","13Fre","17Gua","21Col","22Cer","23Bui","29Pin","35Bus","38Rea","69Mal","99Mal","115Pin","116Oso",
+#             "118lob","119Nev","120Nav","16Poz","18Ber","24Sot","25Rob","31Pue","33Mat","4Val","80Pue","8Rio")
+
+meadow <- c("16Poz","18Ber","24Sot","25Rob","31Pue","33Mat","4Val","80Pue","8Rio")
+
+transect <- subset(data, data$CODIGO %in% meadow)
+
+## Get the centroids ----
+transect_centr <- gCentroid(transect, byid = TRUE)
+transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
+
+
+
+## Get lat and long ----
+
+lat_long <- coordinates(spTransform(transect_centr, CRS("+proj=longlat + datum=WGS84")))
+lat_comp <- lat_long[,2]
+long_comp <- lat_long[,1]
+
+## Get dates ----
+##### 2003-2005 2015-2017
+fi <- seq(as.Date("2015-01-01"), length=36, by="month")
+ff <- seq(as.Date("2015-02-01"), length=36, by="month")-1
+
+
+f_inicio <- data.frame(fecha_mal = fi) %>% 
+  separate(fecha_mal, into = c("dia", "mes", "año")) %>%
+  mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
+  dplyr::select(fecha_bien) %>% 
+  filter(grepl("/03/|/04/|/05/|/06/|/07/|/08/", fecha_bien))
+
+
+f_fin <- data.frame(fecha_mal = ff) %>% 
+  separate(fecha_mal, into = c("dia", "mes", "año")) %>%
+  mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
+  dplyr::select(fecha_bien)%>% 
+  filter(grepl("/03/|/04/|/05/|/06/|/07/|/08/", fecha_bien))
+```
+
+```{r, results = "hide", message = FALSE, warning = FALSE}
+## Run microclima ----
+
+tic("Tiempo ejecucion total: ") 
+
+invisible(for (j in 1:length(lat_comp)){
+  lat <- lat_comp[j]
+  long <- long_comp[j]
+  mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
+  for (i in 1:nrow(f_fin)){
+    temp <- runauto(mdt,
+                    f_inicio[i,], f_fin[i,], 
+                    hgt = 0.1, 
+                    l = NA, x = NA,
+                    coastal = FALSE,
+                    habitat = 10, ######## MODIFICAR #########
+                    plot.progress = FALSE, save.memory = FALSE)
+    tmax <- temp$tmax
+    tmin <-temp$tmin
+    tmed <- temp$tmean
+    writeRaster(tmax, paste0("B:/MARIPOSAS/TRANSECTOS_MICROCLIMA/MICROCLIMA/2015_2017/TMAX/tmax_", meadow[j], "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmin, paste0("B:/MARIPOSAS/TRANSECTOS_MICROCLIMA/MICROCLIMA/2015_2017/TMIN/tmin_", meadow[j], "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmed, paste0("B:/MARIPOSAS/TRANSECTOS_MICROCLIMA/MICROCLIMA/2015_2017/TMED/tmed_", meadow[j], "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+  }
+})
+
+toc()
+
+#number                         descriptor
+# 1        Evergreen needleleaf forest
+# 2         Evergreen Broadleaf forest
+# 3        Deciduous needleleaf forest
+# 4         Deciduous broadleaf forest
+# 5                       Mixed forest
+# 6                  Closed shrublands
+# 7                    Open shrublands
+# 8                     Woody savannas
+# 9                           Savannas
+#10                   Short grasslands
+#11                    Tall grasslands
+#12                 Permanent wetlands
+#13                          Croplands
+#14                 Urban and built-up
+#15 Cropland/Natural vegetation mosaic
+#16       Barren or sparsely vegetated
+#17                         Open water
+
+##--------------------------------------------------------------------------------------------------------------------------------------
+
+```

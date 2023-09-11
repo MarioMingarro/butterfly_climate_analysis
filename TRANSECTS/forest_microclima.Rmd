@@ -1,0 +1,126 @@
+---
+title: "Untitled"
+author: "Mario"
+date: "13/12/2022"
+output: html_document
+---
+
+```{r}
+# Clean and load packages ----
+
+packages.to.use <- c("tictoc", "raster", "devtools", "VoCC","rgeos",
+                     "rasterVis","gridExtra","doParallel","foreach",
+                     "scales","data.table","mapplots","repmis","sf",
+                     "rnaturalearth", "rnaturalearthdata", "viridis", 
+                     "tidyverse","rgdal", "writexl","ggpubr", "diffeR", 
+                     "readxl",  "NicheMapR", "microclima", "rgdal","sf","magrittr",
+                     "tidyverse","tmap",  "lubridate", "PupillometryR")
+
+packages.to.use <- unique(packages.to.use)
+
+for(package in packages.to.use) {
+  print(package)
+  if( ! package %in% rownames(installed.packages()) ) { install.packages(package ) }
+  if( ! package %in% rownames(installed.packages()) ) { stop("Error on package instalation") }
+  suppressWarnings( library(package, character.only = TRUE) )
+}
+
+# Transects------
+
+
+data <- readOGR("B:/MARIPOSAS/TRANSECTOS_MICROCLIMA/transectos_89N.shp")
+
+forest <- c("2Qui", "7Cab","10Ata","14Mor","19Zar","26Pra","30Bec","32Emb","39Zar","40Gra","81Fue","83Mor","85Aba","88Ras","91Arr","92Nav","93Nav","95Fue","100Rev","102Cal")
+
+
+# forest <- c("2Qui","7Cab","10Ata","14Mor","19Zar","26Pra","30Bec","32Emb","39Zar","40Gra",
+#             "41Erm","43Hay","47Bus","52Fon","55Val","56Car","61Ras","62Val","63Vue","65Val",
+#             "66Val","68Pin","72Mor","74Nav","76Mal","79Bal","81Fue","83Mor","85Aba","88Ras",
+#             "91Arr","92Nav","93Nav","95Fue","100Rev","102Cal","101Reg","107lob","109Reg",
+#             "15Fre","1Cha","27Can","44Res","45Hoy","49Abe","54Pue","58Ang","59Enc","5Col",
+#             "70Enc","82Fue","84Pra","97Maj","98Lob","9Rob")
+
+transect <- subset(data, data$CODIGO %in% forest)
+
+## Get the centroids ----
+transect_centr <- gCentroid(transect, byid = TRUE)
+transect_centr <- SpatialPointsDataFrame(transect_centr, data = transect@data)
+
+
+
+## Get lat and long ----
+
+lat_long <- coordinates(spTransform(transect_centr, CRS("+proj=longlat + datum=WGS84")))
+lat_comp <- lat_long[,2]
+long_comp <- lat_long[,1]
+
+## Get dates ----
+##### 2003-2005 2015-2017
+fi <- seq(as.Date("2015-01-01"), length=36, by="month")
+ff <- seq(as.Date("2015-02-01"), length=36, by="month")-1
+
+
+f_inicio <- data.frame(fecha_mal = fi) %>% 
+  separate(fecha_mal, into = c("dia", "mes", "año")) %>%
+  mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
+  dplyr::select(fecha_bien) %>% 
+  filter(grepl("/03/|/04/|/05/|/06/|/07/|/08/", fecha_bien))
+
+
+f_fin <- data.frame(fecha_mal = ff) %>% 
+  separate(fecha_mal, into = c("dia", "mes", "año")) %>%
+  mutate(fecha_bien = paste(año, mes, dia, sep = "/")) %>%
+  dplyr::select(fecha_bien)%>% 
+  filter(grepl("/03/|/04/|/05/|/06/|/07/|/08/", fecha_bien))
+```
+
+```{r, results = "hide", message = FALSE, warning = FALSE}
+## Run microclima ----
+
+tic("Tiempo ejecucion total: ") 
+
+invisible(for (j in 1:length(lat_comp)){
+  lat <- lat_comp[j]
+  long <- long_comp[j]
+  mdt <- microclima::get_dem(lat = lat, long = long, resolution = 30)
+  for (i in 1:nrow(f_fin)){
+    temp <- runauto(mdt,
+                    f_inicio[i,], f_fin[i,], 
+                    hgt = 0.1, 
+                    l = NA, x = NA,
+                    coastal = FALSE,
+                    habitat = 1, ######## MODIFICAR #########
+                    plot.progress = FALSE, save.memory = FALSE)
+    tmax <- temp$tmax
+    tmin <-temp$tmin
+    tmed <- temp$tmean
+    writeRaster(tmax, paste0("B:/MARIPOSAS/TRANSECTOS_MICROCLIMA/MICROCLIMA/2015_2017/TMAX/tmax_", forest[j], "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmin, paste0("B:/MARIPOSAS/TRANSECTOS_MICROCLIMA/MICROCLIMA/2015_2017/TMIN/tmin_", forest[j], "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmed, paste0("B:/MARIPOSAS/TRANSECTOS_MICROCLIMA/MICROCLIMA/2015_2017/TMED/tmed_", forest[j], "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+  }
+})
+
+toc()
+
+#number                         descriptor
+# 1        Evergreen needleleaf forest
+# 2         Evergreen Broadleaf forest
+# 3        Deciduous needleleaf forest
+# 4         Deciduous broadleaf forest
+# 5                       Mixed forest
+# 6                  Closed shrublands
+# 7                    Open shrublands
+# 8                     Woody savannas
+# 9                           Savannas
+#10                   Short grasslands
+#11                    Tall grasslands
+#12                 Permanent wetlands
+#13                          Croplands
+#14                 Urban and built-up
+#15 Cropland/Natural vegetation mosaic
+#16       Barren or sparsely vegetated
+#17                         Open water
+
+##--------------------------------------------------------------------------------------------------------------------------------------
+
+```
