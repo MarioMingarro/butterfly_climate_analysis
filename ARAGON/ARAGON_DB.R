@@ -1,6 +1,7 @@
 library(tidyverse)
 library(readxl)
 library(tidystringdist)
+library(sf)
 
 # All Huesca's data
 Data <- read_excel("B:/A_ROB/ARAGON/Huesca_Data_1965-75.xlsx")
