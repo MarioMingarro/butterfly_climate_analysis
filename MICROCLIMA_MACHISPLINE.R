@@ -5,11 +5,19 @@ gc(reset=TRUE)
 source("Dependencies/Functions.R")
 
 
-cent <- read.csv2("B:/CLIMA_DOWNSCALING/random_points_10km.txt")
+cent <- read.csv2("B:/A_ALBERT/CLIMA_DOWNSCALING/random_points_10km.txt")
+cent <- read.csv2("B:/A_ALBERT/CLIMA_DOWNSCALING/estaciones_AEMET.csv")
+
+cent1 <- read_delim("B:/A_ALBERT/CLIMA_DOWNSCALING/estaciones_AEMET.txt", 
+                               delim = ";", escape_double = FALSE, locale = locale(decimal_mark = ",", 
+                                                                                   grouping_mark = ""), trim_ws = TRUE)
+
+write.csv2(cent1, "B:/A_ALBERT/CLIMA_DOWNSCALING/estaciones_AEMET.csv")
 
 
-lat_comp <- round(cent[,3], 2)
-long_comp <- round(cent[,4], 2)
+lat_comp <- round(cent[,29], 2)
+long_comp <- round(cent[,28], 2)
+
 
 ## Get dates ----
 #####1980 1996 2009
@@ -49,9 +57,9 @@ for (j in 1:length(lat_comp)){
     tmax <- temp$tmax
     tmin <-temp$tmin
     tmed <- temp$tmean
-    writeRaster(tmax, paste0("B:/CLIMA_DOWNSCALING/MICROCLIMA/tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
-    writeRaster(tmin, paste0("B:/CLIMA_DOWNSCALING/MICROCLIMA/tmin_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
-    writeRaster(tmed, paste0("B:/CLIMA_DOWNSCALING/MICROCLIMA/tmed_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmax, paste0("B:/CLIMA_DOWNSCALING/MICROCLIMA/ST_tmax_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmin, paste0("B:/CLIMA_DOWNSCALING/MICROCLIMA/ST_tmin_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
+    writeRaster(tmed, paste0("B:/CLIMA_DOWNSCALING/MICROCLIMA/ST_tmed_", j, "_", gsub("/","_", substr(f_inicio[i,], 4,10)),".tif"))
   }
 }
 toc()
