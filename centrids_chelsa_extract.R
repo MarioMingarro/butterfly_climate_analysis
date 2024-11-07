@@ -158,5 +158,33 @@ ggplot() +
        y = "Temperatura (°C)") +
   theme_minimal()
 
+
+
+kk<- transect_centr_df_1901_2016 %>%
+  pivot_longer(cols = 6:ncol(transect_centr_df_1901_2016),  # Selecciona solo columnas que comienzan con "tmax" (asumiendo que están desde la columna 6)
+               names_to = "Fecha",
+               values_to = "Temperatura") %>%
+  separate(Fecha, into = c("mes", "anio"), sep = "_", convert = TRUE) %>%
+  mutate(fecha = as.Date(paste(anio, mes, "01", sep = "-"))) %>%
+  arrange(fecha)
+
+bb<- transect_centr_df_1979_2019 %>%
+  pivot_longer(cols = 6:ncol(transect_centr_df_1979_2019),  
+               names_to = "Fecha",
+               values_to = "Temperatura") %>%
+  separate(Fecha, into = c("anio", "mes"), sep = "_", convert = TRUE) %>%
+  mutate(fecha = as.Date(paste(anio, mes, "01", sep = "-"))) %>%
+  arrange(fecha)
+
+
+kk <- filter(kk, anio >= "1980" & anio <= "2016")
+bb <- filter(bb, anio >= "1980" & anio <= "2016")
+
+cor(x=kk$Temperatura, y=bb$Temperatura)
+
+
+filter(tran_data_1979_2019, anio == "1990")
+
+
 write.csv2(transect_centr_df_1901_2016,"C:/A_TRABAJO/ELIZA/CHELSA_transectos/transect_centr_df_1901_2016.csv")
 write.csv2(transect_centr_df_1979_2019,"C:/A_TRABAJO/ELIZA/CHELSA_transectos/transect_centr_df_1979_2019.csv")
