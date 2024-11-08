@@ -3,103 +3,134 @@ closeAllConnections()
 rm(list=(ls()[ls()!="v"]))
 gc(reset=TRUE)
 
-
-# Cargar las bibliotecas necesarias
+# Cargar bibliotecas necesarias
 library(sf)
 library(raster)
-library(dplyr)
-
-library(ggplot2)
-library(dplyr)
-library(tidyr)
+library(tidyverse)
 
 # Cargar la capa de puntos
 transect_centr <- sf::read_sf("D:/A_MNCN/A_ROB/cent_5_system_WGS84.shp")
 
-
-# 1901_2016 ----
+# Procesar para 1901_2016 ----
 # Lista de archivos raster
-raster_files <- list.files("D:/A_DATA/CHELSA/MONTHLY_1901_2016/TMAX/", pattern = ".tif", full.names = TRUE)
+raster_files_1901_2016 <- list.files("D:/A_DATA/CHELSA/MONTHLY_1901_2016/TMAX/", pattern = ".tif", full.names = TRUE)
 
-# Convertir a un data frame para añadir valores de ráster fácilmente
+# Convertir a un data frame
 transect_centr_df <- as.data.frame(transect_centr)
 
-# Iterar sobre cada ráster y extraer los valores
-for (raster_path in raster_files) {
-    # Cargar el ráster actual
-    raster_layer <- raster(raster_path)
-    
-    # Extraer el valor del ráster para cada punto
-    raster_values <- raster::extract(raster_layer, transect_centr)
-    
-    # Crear un nombre de columna único basado en el nombre del archivo de ráster, simplificado
-    raster_name <- gsub("CHELSAcruts_tmax_|_V.1.0|\\.tif", "", basename(raster_path))
-    
-    # Añadir la columna con los valores extraídos al data frame
-    transect_centr_df[[raster_name]] <- raster_values/10
-  }
-
-
-# Extraer los nombres de las columnas
-colnames_original <- colnames(transect_centr_df)
-
-# Filtrar las columnas que corresponden a los datos de temperatura, que empiezan con "tmax"
-tmax_cols <- grep("^tmax_\\d+_\\d+$", colnames_original, value = TRUE)
-
-# Extraer mes y año de cada columna en formato numérico
-# Dividir las columnas en una tabla con mes y año para cada columna
-tmax_split <- do.call(rbind, strsplit(gsub("tmax_", "", tmax_cols), "_"))
-mes <- as.numeric(tmax_split[,1])
-anio <- as.numeric(tmax_split[,2])
-
-# Crear un data.frame temporal para ordenar mes y año
-df_temp <- data.frame(mes = mes, anio = anio, col = tmax_cols)
-
-# Ordenar primero por año, luego por mes
-df_temp <- df_temp[order(df_temp$anio, df_temp$mes), ]
-
-# Reordenar las columnas en el orden correcto
-col_order <- c(setdiff(colnames_original, tmax_cols), df_temp$col)
-transect_centr_df <- transect_centr_df[, col_order]
-
-
-transect_centr_df_1901_2016 <- transect_centr_df
-
-
-# 1979_2019 ----
-# Lista de archivos raster
-raster_files <- list.files("D:/A_DATA/CHELSA/MONTHLY_1979_2019/TMAX/", pattern = ".tif", full.names = TRUE)
-
-# Convertir a un data frame para añadir valores de ráster fácilmente
-transect_centr_df <- as.data.frame(transect_centr)
-
-# Iterar sobre cada ráster y extraer los valores
-for (raster_path in raster_files) {
-  # Cargar el ráster actual
+# Extraer valores de cada ráster y crear nombres de columna uniformes
+for (raster_path in raster_files_1901_2016) {
+  # Cargar ráster
   raster_layer <- raster(raster_path)
   
-  # Extraer el valor del ráster para cada punto
+  # Extraer valores del ráster para cada punto
   raster_values <- raster::extract(raster_layer, transect_centr)
   
-  # Crear un nombre de columna único basado en el nombre del archivo de ráster, simplificado
-  raster_name <- gsub("CHELSAcruts_|_V.1.0|\\.tif", "", basename(raster_path))
-  
-  # Añadir la columna con los valores extraídos al data frame
-  transect_centr_df[[raster_name]] <- raster_values
+  # Crear nombre de columna con formato MM_YYYY
+  raster_name <- gsub("CHELSAcruts_tmax_|_V.1.0|\\.tif", "", basename(raster_path))
+  split_name <- unlist(strsplit(raster_name, "_"))
+  mes <- sprintf("%02d", as.numeric(split_name[1]))  # Asegurar formato de dos dígitos
+  anio <- split_name[2]
+  transect_centr_df[[paste0(mes, "_", anio)]] <- raster_values / 10
 }
-
 
 # Extraer los nombres de las columnas
 colnames_original <- colnames(transect_centr_df)
 
-# Filtrar las columnas que corresponden a los datos de temperatura, que empiezan con "tmax"
-tmax_cols <- grep("^tmax_\\d+_\\d+$", colnames_original, value = TRUE)
+# Filtrar las columnas que contienen datos de temperatura, que empiezan con el formato `MM_YYYY`
+cols <- grep("^[0-9]{2}_[0-9]{4}$", colnames_original, value = TRUE)
 
 # Extraer mes y año de cada columna en formato numérico
-# Dividir las columnas en una tabla con mes y año para cada columna
-tmax_split <- do.call(rbind, strsplit(gsub("tmax_", "", tmax_cols), "_"))
-mes <- as.numeric(tmax_split[,1])
-anio <- as.numeric(tmax_split[,2])
+temp_split <- do.call(rbind, strsplit(cols, "_"))
+mes <- as.numeric(temp_split[, 1])
+anio <- as.numeric(temp_split[, 2])
+
+# Crear un data.frame temporal para ordenar por año y mes
+df_temp <- data.frame(mes = mes, anio = anio, col = cols)
+
+# Ordenar primero por año, luego por mes
+df_temp <- df_temp[order(df_temp$anio, df_temp$mes), ]
+
+# Reordenar las columnas en el orden correcto
+col_order <- c(setdiff(colnames_original, cols), df_temp$col)
+transect_centr_df <- transect_centr_df[, col_order]
+
+# Guardar en un nuevo data frame
+transect_centr_df_1901_2016 <- transect_centr_df
+
+# Limpiar el entorno para evitar conflictos
+rm(list = setdiff(ls(), c("transect_centr_df_1901_2016", "transect_centr")))
+
+
+# Procesar para 1979_2019 ----
+# Lista de archivos raster
+raster_files_1979_2019 <- list.files("D:/A_DATA/CHELSA/MONTHLY_1979_2019/TMAX/", pattern = ".tif", full.names = TRUE)
+
+# Convertir a un data frame
+transect_centr_df <- as.data.frame(transect_centr)
+
+# Extraer valores de cada ráster y crear nombres de columna uniformes
+for (raster_path in raster_files_1979_2019) {
+  # Cargar ráster
+  raster_layer <- raster(raster_path)
+  
+  # Extraer valores del ráster para cada punto
+  raster_values <- raster::extract(raster_layer, transect_centr)
+  
+  # Crear nombre de columna con formato MM_YYYY
+  raster_name <- gsub("\\.tif", "", basename(raster_path))
+  split_name <- unlist(strsplit(raster_name, "_"))
+  anio <- split_name[1]
+  mes <- sprintf("%02d", as.numeric(split_name[2]))  # Asegurar formato de dos dígitos
+  transect_centr_df[[paste0(mes, "_", anio)]] <- raster_values
+}
+
+# Extraer los nombres de las columnas
+colnames_original <- colnames(transect_centr_df)
+
+# Filtrar las columnas que contienen datos de temperatura, que empiezan con el formato `MM_YYYY`
+cols <- grep("^[0-9]{2}_[0-9]{4}$", colnames_original, value = TRUE)
+
+# Extraer mes y año de cada columna en formato numérico
+temp_split <- do.call(rbind, strsplit(cols, "_"))
+mes <- as.numeric(temp_split[, 1])
+anio <- as.numeric(temp_split[, 2])
+
+# Crear un data.frame temporal para ordenar por año y mes
+df_temp <- data.frame(mes = mes, anio = anio, col = cols)
+
+# Ordenar primero por año, luego por mes
+df_temp <- df_temp[order(df_temp$anio, df_temp$mes), ]
+
+# Reordenar las columnas en el orden correcto
+col_order <- c(setdiff(colnames_original, cols), df_temp$col)
+transect_centr_df <- transect_centr_df[, col_order]
+
+# Guardar en un nuevo data frame
+transect_centr_df_1979_2019 <- transect_centr_df
+
+# Limpiar el entorno y conservar solo los objetos deseados
+rm(list = setdiff(ls(), c("transect_centr_df_1901_2016", "transect_centr", "transect_centr_df_1979_2019")))
+
+
+write.csv2(transect_centr_df_1901_2016,"C:/A_TRABAJO/ELIZA/CHELSA_transectos/transect_centr_df_1901_2016.csv",  
+           row.names = FALSE, fileEncoding = "ISO-8859-1")
+write.csv2(transect_centr_df_1979_2019,"C:/A_TRABAJO/ELIZA/CHELSA_transectos/transect_centr_df_1979_2019.csv",  
+           row.names = FALSE, fileEncoding = "ISO-8859-1")
+
+
+
+# Crear un data.frame reestructurado en formato largo para análisis
+transect_long_df <- transect_centr_df_1901_2016 %>%
+  pivot_longer(cols = all_of(transect_centr_df_1901_2016),
+               names_to = "Fecha",
+               values_to = "Temperatura") %>%
+  mutate(mes = as.numeric(sub("_.*", "", Fecha)),
+         anio = as.numeric(sub("^[0-9]+_", "", Fecha))) %>%
+  select(-Fecha) # eliminar la columna original "Fecha" si no es necesaria
+
+# Verificar el resultado
+head(transect_long_df)
 
 # Crear un data.frame temporal para ordenar mes y año
 df_temp <- data.frame(mes = mes, anio = anio, col = tmax_cols)
@@ -110,7 +141,7 @@ df_temp <- df_temp[order(df_temp$anio, df_temp$mes), ]
 # Reordenar las columnas en el orden correcto
 col_order <- c(setdiff(colnames_original, tmax_cols), df_temp$col)
 transect_centr_df <- transect_centr_df[, col_order]
-
+colnames(transect_centr_df) <- 
 
 transect_centr_df_1979_2019 <- transect_centr_df
 
@@ -118,73 +149,87 @@ transect_centr_df_1979_2019 <- transect_centr_df
 
 
 
-# plotear----
+# Comparación periodo común (1980-2016) ----
 
-transect_centr_df_1901_2016$Name
-
-# Filtrar la fila donde Name es "Astún"
-tran_data_1901_2016 <- transect_centr_df_1901_2016 %>%
-  filter(Name == "Las Tiesas") %>%
-  pivot_longer(cols = 6:ncol(transect_centr_df_1901_2016),  # Selecciona solo columnas que comienzan con "tmax" (asumiendo que están desde la columna 6)
-               names_to = "Fecha",
-               values_to = "Temperatura")
-
-# Separar la columna "Fecha" en mes y año
-tran_data_1901_2016 <- tran_data_1901_2016 %>%
-  separate(Fecha, into = c("mes", "anio"), sep = "_", convert = TRUE) %>%
-  mutate(fecha = as.Date(paste(anio, mes, "01", sep = "-"))) %>%
-  arrange(fecha)
-
-
-
-# Filtrar la fila donde Name es "Astún"
-tran_data_1979_2019 <- transect_centr_df_1979_2019 %>%
-  filter(Name == "Las Tiesas") %>%
-  pivot_longer(cols = 6:ncol(transect_centr_df_1979_2019),  # Selecciona solo columnas que comienzan con "tmax" (asumiendo que están desde la columna 6)
-               names_to = "Fecha",
-               values_to = "Temperatura")
-
-# Separar la columna "Fecha" en mes y año
-tran_data_1979_2019 <- tran_data_1979_2019 %>%
-  separate(Fecha, into = c("anio", "mes"), sep = "_", convert = TRUE) %>%
-  mutate(fecha = as.Date(paste(anio, mes, "01", sep = "-"))) %>%
-  arrange(fecha)
-
-# Graficar las temperaturas frente a las fechas
-ggplot() +
-  geom_line(data=tran_data_1901_2016, aes(x = fecha, y = Temperatura),color = "red") +
-  geom_line(data=tran_data_1979_2019, aes(x = fecha, y = Temperatura),color = "blue") +
-  labs(x = "Fecha",
-       y = "Temperatura (°C)") +
-  theme_minimal()
-
-
-
-kk<- transect_centr_df_1901_2016 %>%
+pivot_df_1901_2016 <- transect_centr_df_1901_2016 %>%
   pivot_longer(cols = 6:ncol(transect_centr_df_1901_2016),  # Selecciona solo columnas que comienzan con "tmax" (asumiendo que están desde la columna 6)
                names_to = "Fecha",
                values_to = "Temperatura") %>%
   separate(Fecha, into = c("mes", "anio"), sep = "_", convert = TRUE) %>%
   mutate(fecha = as.Date(paste(anio, mes, "01", sep = "-"))) %>%
-  arrange(fecha)
+  arrange(fecha) %>% 
+  filter(anio >= "1980" & anio <= "2016")
 
-bb<- transect_centr_df_1979_2019 %>%
+pivot_df_1979_2019 <- transect_centr_df_1979_2019 %>%
   pivot_longer(cols = 6:ncol(transect_centr_df_1979_2019),  
                names_to = "Fecha",
                values_to = "Temperatura") %>%
-  separate(Fecha, into = c("anio", "mes"), sep = "_", convert = TRUE) %>%
+  separate(Fecha, into = c("mes", "anio"), sep = "_", convert = TRUE) %>%
   mutate(fecha = as.Date(paste(anio, mes, "01", sep = "-"))) %>%
-  arrange(fecha)
+  arrange(fecha)%>% 
+  filter(anio >= "1980" & anio <= "2016")
+
+summary(pivot_df_1901_2016$Temperatura)
+summary(pivot_df_1979_2019$Temperatura)
+cor(x=pivot_df_1901_2016$Temperatura, y=pivot_df_1979_2019$Temperatura)
+
+# Regiones ----
+#Ver todos las regiones
+unique(transect_centr_df_1901_2016$Region)
+
+# Filtrar por nombre de region
+filtro_df_1901_2016 <- pivot_df_1901_2016 %>% 
+  filter(Region == "Gredos")
+filtro_df_1979_2019 <- pivot_df_1979_2019 %>% 
+  filter(Region == "Gredos")
 
 
-kk <- filter(kk, anio >= "1980" & anio <= "2016")
-bb <- filter(bb, anio >= "1980" & anio <= "2016")
+ggplot() +
+  geom_line(data=filtro_df_1901_2016, aes(x = fecha, y = Temperatura),color = "red", alpha = .5) +
+  geom_line(data=filtro_df_1979_2019, aes(x = fecha, y = Temperatura),color = "blue", alpha = .5) +
+  geom_smooth(data=filtro_df_1901_2016, aes(x = fecha, y = Temperatura),color = "red", fill = "red", alpha = .5) +
+  geom_smooth(data=filtro_df_1979_2019, aes(x = fecha, y = Temperatura),color = "blue", fill = "blue", alpha = .5) +
+  labs(title = paste0(filtro_df_1901_2016$Region),
+       x = "Fecha",
+       y = "Temperatura (°C)") +
+  theme_minimal()
 
-cor(x=kk$Temperatura, y=bb$Temperatura)
+summary(filtro_df_1901_2016$Temperatura)
+summary(filtro_df_1979_2019$Temperatura)
+cor(x=filtro_df_1901_2016$Temperatura, y=filtro_df_1979_2019$Temperatura)
+
+# Transectos ----
+#Ver todos los transectos
+unique(transect_centr_df_1901_2016$Name)
+
+# Filtrar por nombre de transecto
+filtro_df_1901_2016 <- pivot_df_1901_2016 %>% 
+filter(Name == "TRG")
+filtro_df_1979_2019 <- pivot_df_1979_2019 %>% 
+filter(Name == "TRG")
+
+filtro_df_1901_2016 <- pivot_df_1901_2016 %>% 
+  filter(Region == "Pirineos")
+filtro_df_1979_2019 <- pivot_df_1979_2019 %>% 
+  filter(Region == "Pirineos")
 
 
-filter(tran_data_1979_2019, anio == "1990")
+ggplot() +
+  geom_line(data=filtro_df_1901_2016, aes(x = fecha, y = Temperatura),color = "red", alpha = .5) +
+  geom_line(data=filtro_df_1979_2019, aes(x = fecha, y = Temperatura),color = "blue", alpha = .5) +
+  geom_smooth(data=filtro_df_1901_2016, aes(x = fecha, y = Temperatura),color = "red", fill = "red", alpha = .5) +
+  geom_smooth(data=filtro_df_1979_2019, aes(x = fecha, y = Temperatura),color = "blue", fill = "blue", alpha = .5) +
+  labs(title = paste0(filtro_df_1901_2016$Name),
+       subtitle = paste0(filtro_df_1901_2016$Region),
+       x = "Fecha",
+       y = "Temperatura (°C)") +
+  theme_minimal()
+
+summary(filtro_df_1901_2016$Temperatura)
+summary(filtro_df_1979_2019$Temperatura)
+cor(x=filtro_df_1901_2016$Temperatura, y=filtro_df_1979_2019$Temperatura)
 
 
-write.csv2(transect_centr_df_1901_2016,"C:/A_TRABAJO/ELIZA/CHELSA_transectos/transect_centr_df_1901_2016.csv")
-write.csv2(transect_centr_df_1979_2019,"C:/A_TRABAJO/ELIZA/CHELSA_transectos/transect_centr_df_1979_2019.csv")
+
+
+
