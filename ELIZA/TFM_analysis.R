@@ -1,6 +1,8 @@
 library(tidyverse)
 UTM_transectos <- readxl::read_xlsx("C:/A_TRABAJO/ELIZA/DATA/TRANSECTOS/UTM_transectos_pirineos_2024.xlsx")
-# TMAX ----
+# 1---- 
+
+## TMAX ----
 climate_data_P1 <- readxl::read_xlsx("C:/A_TRABAJO/ELIZA/DATA/CLIMA/Transectos_Chelsa.xlsx", sheet = "tmax_transect_centr_1901_2016")
 Tmax_P1 <- left_join(UTM_transectos, climate_data_P1, by = "Name")
 Tmax_P1 <- Tmax_P1[, c(1:6, 775:894)]
@@ -20,7 +22,7 @@ res_m_max <- reshape2::melt(res_max)
 ggplot(res_m_max, aes(x = variable, y = value, fill = variable)) +
   geom_boxplot()
 
-# TMIN ----
+## TMIN ----
 climate_data_P1 <- readxl::read_xlsx("C:/A_TRABAJO/ELIZA/DATA/CLIMA/Transectos_Chelsa.xlsx", sheet = "tmin_transect_centr_1901_2016")
 Tmin_P1 <- left_join(UTM_transectos, climate_data_P1, by = "Name")
 Tmin_P1 <- Tmin_P1[, c(1:6, 775:894)]
@@ -38,5 +40,6 @@ wilcox.test(res_min$mean_p1_min, res_min$mean_p2_min, paired= T)
 res_m_min <- reshape2::melt(res_min)
 
 ggplot() +
-  geom_boxplot(data=res_m_max, aes(x = variable, y = value, fill = variable))+
   geom_boxplot(data=res_m_min, aes(x = variable, y = value, fill = variable))
+
+#2 ----
